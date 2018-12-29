@@ -1,0 +1,22 @@
+{
+  "compileOnSave": true,
+  "files": [ "scripts/hjow_common.js", "scripts/xcard.ts" ],
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "allowJs": true,
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost",
+      "es2015.iterable"
+    ],
+    "outDir": "www/xcard/js",
+    "module": "amd",
+    "target": "es5"
+  },
+  "exclude": [ "platforms", "node_modules", "bower_components", "plugins", "merges", "res", "bin", "bld" ]
+}
