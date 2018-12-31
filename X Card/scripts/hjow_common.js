@@ -317,3 +317,23 @@ function hjow_bigint_compare(a, b) {
 }
 
 h.bigint_compare = hjow_bigint_compare;
+
+function hjow_date_to_string(dateObj) {
+    return dateObj.getFullYear() + "." + (dateObj.getMonth() + 1) + "." + dateObj.getDate() + "." + dateObj.getHours() + "." + dateObj.getMinutes() + "." + dateObj.getSeconds();
+}
+
+h.date_to_string = hjow_date_to_string;
+
+function hjow_string_to_date(dateStr) {
+    var stringSplits = String(dateStr).split(".");
+    var result = new Date();
+    result.setFullYear(parseInt(stringSplits[0]));
+    result.setMonth(parseInt(stringSplits[1]) - 1);
+    result.setDate(parseInt(stringSplits[2]));
+    result.setHours(parseInt(stringSplits[3]));
+    result.setMinutes(parseInt(stringSplits[4]));
+    result.setSeconds(parseInt(stringSplits[5]));
+    return result;
+}
+
+h.string_to_date = hjow_string_to_date;

@@ -158,15 +158,32 @@ limitations under the License.
 
 .xcard_place .toolbar {
     width: 100%;
-    max-height: 17px;
+    max-height: 22px;
     border: 1px solid skyblue;
-    background-color: aqua;
+    background-color: lightgray;
     text-align: center;
-    font-size: 12px;
+    padding: 0;
 }
 
 
 .xcard_place .toolbar button {
     font-size: 10px;
     max-height: 15px;
+}
+
+.xcard_place .toolbar span {
+    margin: 0;
+    font-size: 10px;
+}
+
+.xcard_place .replay_result {
+    width: 100%;
+    height: 100px;
+    max-height: 100px;
+    display: none;
+}
+
+.xcard_place .replay_json {
+    width: 100%;
+    height: 100%;
 }
