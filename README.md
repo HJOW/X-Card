@@ -1,6 +1,6 @@
 # X-Card
 
-이 프로젝트는? (What is this project?)
+## 이 프로젝트는? (What is this project?)
 
    X Card 게임은 HTML과 타입스크립트로 작성되었습니다.
    이 프로젝트는 Windows Universal App 으로 배포될 예정이지만, 브라우저로도 실행이 가능하도록 개발중입니다.
@@ -8,7 +8,7 @@
    X Card is card game run on HTML and typescript.
    This project will run on Windows Universal App, but codes will capable on browser.
    
-게임 규칙 (Game Rule)
+## 게임 규칙 (Game Rule)
    
    플레이어는 최소 2명 이상이어야 하고, 최대 제한은 없지만 4명이서 플레이하는 것을 권장합니다.
    인공지능 컴퓨터와의 플레이를 지원할 예정입니다.
@@ -69,7 +69,7 @@
    점수가 가장 높은 플레이어가 승리합니다.
    The player with the highest score wins.
 
-사용된 외부 라이브러리 (Dependencies)
+## 사용된 외부 라이브러리 (Dependencies)
 
    jQuery : https://jquery.com/
        license : MIT
@@ -78,7 +78,7 @@
    BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
        license : Unlicense. (Public Domain)
 
-라이센스 (License)
+## 라이센스 (License)
 
    Copyright 2018 HJOW (hujinone22@naver.com)
    
