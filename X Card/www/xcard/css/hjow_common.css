@@ -24,7 +24,7 @@ body {
     overflow-x: hidden;
     overflow-y: hidden;
 }
-div.page, table.full, td.full {
+div.page, table.full, td.full, button.full {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
@@ -34,4 +34,30 @@ div.page, table.full, td.full {
 .min_size, .layout {
     min-width: 640px;
     min-height: 480px;
+}
+.min_height {
+    min-height: 480px;
+}
+.min_width_100 {
+    min-width: 100px;
+}
+
+.progress {
+    border: 1px solid gray;
+    background-color: white;
+    width: 200px;
+    height: 20px;
+    display: block;
+}
+
+.progress_in {
+    background-color: skyblue;
+    width: 0px;
+    height: 18px;
+    display: block;
+    text-align: center;
+}
+
+.accents {
+    border: 4px dashed red !important;
 }

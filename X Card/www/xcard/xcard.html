@@ -33,6 +33,7 @@ limitations under the License.
             jq = jQuery;
             h.engine = new XCardGameEngine();
             h.engine.init();
+            $(window).on('resize', h.engine.events.onResize);
         });
     </script>
 </head>

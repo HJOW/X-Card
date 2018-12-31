@@ -37,6 +37,8 @@ h.replaceStr = hjow_replaceStr;
 h.property.logFormat = '[%TODAY%] %LOG%';
 
 function hjow_log(obj) {
+    if (typeof (console) == 'undefined') return;
+    if (typeof (console.log) == 'undefined') return;
     var contents = String(h.property.logFormat);
     contents = h.replaceStr(contents, '%TODAY%', String(new Date()));
     contents = h.replaceStr(contents, '%LOG%', String(obj));
@@ -107,6 +109,15 @@ function hjow_serializeString(str) {
 
 h.serializeString = hjow_serializeString;
 
+function hjow_serializeXMLString(str) {
+    var results = String(str);
+    results = h.replaceStr(results, '<', '&lt;');
+    results = h.replaceStr(results, '>', '&gt;');
+    return results;
+};
+
+h.serializeXMLString = hjow_serializeXMLString;
+
 function hjow_reverseSerializeString(str) {
     var results = String(str);
     results = h.replaceStr(results, '\\' + '"', '"');
@@ -176,3 +187,35 @@ function hjow_ramdomizeArrayOrder(arr) {
 }
 
 h.ramdomizeArrayOrder = hjow_ramdomizeArrayOrder;
+
+function hjow_setProgressValue(progressBarObj, valueAsFloat, text) {
+    var progObj = $(progressBarObj);
+    var progIn = progObj.find('.progress_in');
+
+    var maxWidth = progObj.width() * 1.0;
+    var calcWidth = Math.round(valueAsFloat * maxWidth);
+
+    if (typeof (text) == 'undefined') text = "";
+    progIn.text(text);
+    
+    progIn.width(calcWidth);
+}
+
+h.setProgressValue = hjow_setProgressValue;
+
+function hjow_accentElement(obj, seconds) {
+    var targetObj = $(obj);
+    targetObj.addClass('accents');
+
+    var firsts = true;
+    var timer = setTimeout(function () {
+        if (firsts) {
+            firsts = false;
+            continue;
+        }
+        targetObj.removeClass('accents');
+        clearTimeout(timer);
+    }, seconds * 1000);
+}
+
+h.accentElement = hjow_accentElement;
