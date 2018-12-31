@@ -3,7 +3,11 @@
 This JS library is made by HJOW.
 E-mail : hujinone22@naver.com
 
-This library need jQuery, jQuery UI.
+This library need jQuery, jQuery UI, BigInteger.js.
+
+jQuery : https://jquery.com/
+jQuery UI : https://jqueryui.com/
+BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
 */
 /*
 Copyright 2018 HJOW (hujinone22@naver.com)
@@ -246,3 +250,70 @@ function hjow_getLocaleInfo() {
 }
 
 h.getLocaleInfo = hjow_getLocaleInfo;
+
+function hjow_bigint(obj) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            return obj;
+        } else {
+            return BigInt(obj);
+        }
+    }
+    return bigInt(obj);
+}
+
+h.bigint = hjow_bigint;
+
+function hjow_bigint_add(a, b) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            return a + b;
+        } else {
+            return BigInt(a).add(BigInt(b));
+        }
+    }
+    return bigInt(a).add(bigInt(b));
+}
+
+h.bigint_add = hjow_bigint_add;
+
+function hjow_bigint_subtract(a, b) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            return a - b;
+        } else {
+            return BigInt(a).subtract(BigInt(b));
+        }
+    }
+    return bigInt(a).subtract(bigInt(b));
+}
+
+h.bigint_subtract = hjow_bigint_subtract;
+
+function hjow_bigint_multiply(a, b) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            return a * b;
+        } else {
+            return BigInt(a).multiply(BigInt(b));
+        }
+    }
+    return bigInt(a).multiply(bigInt(b));
+}
+
+h.bigint_multiply = hjow_bigint_multiply;
+
+function hjow_bigint_compare(a, b) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            if (a == b) return 0;
+            if (a > b) return 1;
+            return -1;
+        } else {
+            return BigInt(a).compare(BigInt(b));
+        }
+    }
+    return bigInt(a).compare(bigInt(b));
+}
+
+h.bigint_compare = hjow_bigint_compare;

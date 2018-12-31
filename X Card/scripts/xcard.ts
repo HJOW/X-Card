@@ -255,11 +255,14 @@ class ImportantTimer extends IntervalTimer {
 class XCard extends Uniqueable {
     public no: number = 0;
     public op: string = '';
-    public apply(beforeVal: number): number {
-        if (this.op == '+' || this.op == '＋') return beforeVal + this.no;
-        if (this.op == '-' || this.op == '－') return beforeVal - this.no;
-        if (this.op == '*' || this.op == '×') return beforeVal * this.no;
-        if (this.op == '/' || this.op == '÷') return beforeVal / this.no;
+    public apply(beforeVal: any): any {
+        if (this.op == '+' || this.op == '＋') return hjow_bigint_add(hjow_bigint(beforeVal), hjow_bigint(this.no));
+        if (this.op == '-' || this.op == '－') return hjow_bigint_subtract(hjow_bigint(beforeVal), hjow_bigint(this.no));
+        if (this.op == '*' || this.op == '×') return hjow_bigint_multiply(hjow_bigint(beforeVal), hjow_bigint(this.no));
+
+        // if (this.op == '+' || this.op == '＋') return beforeVal + this.no;
+        // if (this.op == '-' || this.op == '－') return beforeVal - this.no;
+        // if (this.op == '*' || this.op == '×') return beforeVal * this.no;
 
         return beforeVal;
     }
@@ -450,8 +453,8 @@ class XCardPlayer extends Uniqueable {
         return this.pay(card, owner);
     };
     
-    public getCurrentPoint(): number {
-        var results: number = 0;
+    public getCurrentPoint(): any {
+        var results: any = hjow_bigint(0);
         for (var idx = 0; idx < this.applied.length; idx++) {
             var cardOne = this.applied[idx];
             results = cardOne.apply(results);
@@ -1089,7 +1092,7 @@ class XCardGameEngine extends ModuleObject {
             var playerBlock = jq(".xcard_place .presult_" + hjow_serializeString(playerOne.getUniqueId()));
             playerBlock.find(".i_name").val(playerOne.getName());
             playerBlock.find(".i_type").val(playerOne.getPlayerTypeName());
-            playerBlock.find(".i_point").val(playerOne.getCurrentPoint());
+            playerBlock.find(".i_point").val(String(playerOne.getCurrentPoint()));
             playerBlock.find(".i_affects").val(playerOne.listAppliedAsString());
         }
     };
@@ -1187,7 +1190,7 @@ class XCardGameEngine extends ModuleObject {
             } else {
                 for (var tdx2 = 0; tdx2 < temps.length; tdx2++) {
                     var points = temps[tdx2].getCurrentPoint();
-                    if (maxVal == null || parseFloat(maxVal) < points) {
+                    if (maxVal == null || hjow_bigint_compare(hjow_bigint(maxVal), points) < 0) {
                         maxVal = String(points);
                         maxIdx = tdx2;
                     }
