@@ -4,6 +4,8 @@ This JS library is made by HJOW.
 E-mail : hujinone22@naver.com
 
 This library need following libraries : jQuery UI, hjow_common.
+
+jQuery UI : https://jqueryui.com/
 */
 /*
 Copyright 2018 HJOW (hujinone22@naver.com)
@@ -20,40 +22,48 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-div.debugMode, td.debugMode {
+.xcard_place div.debugMode, td.debugMode {
     border: 1px solid gray !important;
 }
 
-td.td_game_title {
+.xcard_place td.td_game_title {
     height: 30px;
 }
 
-    td.td_game_title h2, td.td_game_title h1 {
-        font-size: 25px;
-    }
-
-td.td_player {
-    border: 1px solid gray;
+.xcard_place td.td_game_title h2, td.td_game_title h1 {
+    font-size: 25px;
 }
 
-button.btn_game_start {
+.xcard_place td.td_player {
+    border: 2px solid gray;
+}
+
+.xcard_place td.td_player td{
+    border: 1px solid lightgray;
+}
+
+.xcard_place button.btn_game_start {
     font-size: 20px;
 }
 
-td.td_player_list table.player_list tr:not(.tr_player_empty), td.td_player_list table.player_list td:not(.td_player_empty), td.td_player_list table.player_list table.player_each, td.td_player_list table.player_list table.player_each td {
+.xcard_place td.td_player_list table.player_list tr:not(.tr_player_empty), td.td_player_list table.player_list td:not(.td_player_empty), td.td_player_list table.player_list table.player_each, td.td_player_list table.player_list table.player_each td {
     width: 100%;
-    height: 100px;
     max-height: 100px;
 }
 
-div.player_list_div {
+.xcard_place table.player_each {
+    height: 60px;
+}
+
+.xcard_place div.player_list_div {
     overflow-x: hidden;
     overflow-y: scroll;
     min-height: 300px;
     height: 100%;
+    border:1px solid black;
 }
 
-div.player_arena_div {
+.xcard_place div.player_arena_div {
     overflow-x: scroll;
     overflow-y: hidden;
     min-height: 300px;
@@ -65,44 +75,88 @@ div.player_arena_div {
     flex-basis: 33%;
 }
 
-td.td_deck, td.td_game_status {
+.xcard_place td.td_deck, td.td_game_status {
     height: 30px;
 }
 
-td.td_player_arena_each, table.table_player_arena_each {
+.xcard_place td.td_player_arena_each, table.table_player_arena_each {
     min-height: 480px;
     min-width: 100px;
     max-width: 300px;
 }
 
-div.div_player_arena_each {
+.xcard_place div.div_player_arena_each {
     height: 100%;
     flex: 0 0 auto;
 }
 
-table.table_player_arena_each td {
+.xcard_place table.table_player_arena_each td {
     border: 1px solid lightgray;
 }
 
-select.select_player_arena {
+.xcard_place select.select_player_arena {
     width: 100%;
     height: 100%;
     min-width: 120px;
     min-height: 150px;
 }
 
-.player_arena_one_line_layout {
+.xcard_place .player_arena_one_line_layout {
     height: 30px;
 }
 
-table.table_player_arena_each.current_turn {
+.xcard_place table.table_player_arena_each.current_turn {
     border: 3px solid green;
 }
 
-table.table_player_arena_each:not(.current_turn) {
+.xcard_place table.table_player_arena_each:not(.current_turn) {
     border: 1px solid darkgray;
 }
 
-.progress {
+.xcard_place .progress {
     width: 100%;
+}
+
+.xcard_place .table_each_player_result {
+    border: 2px solid gray;
+    width: 100%;
+    max-height: 120px;
+}
+
+.xcard_place .table_each_player_result.order_player_0 {
+    border: 3px solid gold;
+}
+
+.xcard_place .table_each_player_result.order_player_1 {
+    border: 3px solid silver;
+}
+
+.xcard_place .table_each_player_result.order_player_2 {
+    border: 3px solid orange;
+}
+
+.xcard_place .table_each_player_result td {
+    border: 1px solid lightgray;
+}
+
+.xcard_place .table_each_player_result td.label {
+    width: 100px;
+    max-width: 100px;
+}
+
+.xcard_place .table_each_player_result .i_name {
+    width: 100%;
+}
+
+.xcard_place .table_each_player_result .i_type {
+    width: 70px;
+}
+
+.xcard_place .table_each_player_result .i_affects {
+    width: 100%;
+}
+
+.xcard_place .toolbar {
+    width: 100%;
+    max-height: 20px;
 }

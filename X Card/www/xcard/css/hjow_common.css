@@ -61,3 +61,7 @@ div.page, table.full, td.full, button.full {
 .accents {
     border: 4px dashed red !important;
 }
+
+.label {
+    font-weight:bold;
+}

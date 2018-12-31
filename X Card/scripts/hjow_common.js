@@ -47,6 +47,12 @@ function hjow_log(obj) {
 
 h.log = hjow_log;
 
+function hjow_alert(obj) {
+    alert(obj);
+};
+
+h.alert = hjow_alert;
+
 h.property.debugMode = false;
 
 function hjow_debugMode() {
@@ -192,6 +198,16 @@ function hjow_setProgressValue(progressBarObj, valueAsFloat, text) {
     var progObj = $(progressBarObj);
     var progIn = progObj.find('.progress_in');
 
+    if (typeof (valueAsFloat) == 'undefined') valueAsFloat = 0;
+    if (valueAsFloat == null) valueAsFloat = 0;
+    try {
+        if (typeof (valueAsFloat) == 'string') valueAsFloat = parseFloat(valueAsFloat);
+    } catch (e) {
+        valueAsFloat = 0;
+    }
+    if (valueAsFloat < 0) valueAsFloat = 0;
+    if (valueAsFloat >= 1) valueAsFloat = 1;
+    
     var maxWidth = progObj.width() * 1.0;
     var calcWidth = Math.round(valueAsFloat * maxWidth);
 
@@ -219,3 +235,14 @@ function hjow_accentElement(obj, seconds) {
 }
 
 h.accentElement = hjow_accentElement;
+
+function hjow_getLocaleInfo() {
+    var results = [];
+    if (typeof (window.navigator.languages) == 'undefined') {
+        results.push(window.navigator.language);
+        return results;
+    }
+    return window.navigator.languages;
+}
+
+h.getLocaleInfo = hjow_getLocaleInfo;
