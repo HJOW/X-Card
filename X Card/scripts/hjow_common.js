@@ -363,3 +363,15 @@ function hjow_isArray(a) {
 }
 
 h.isArray = hjow_isArray;
+
+function hjow_toStaticHTML(htmlStr) {
+    try {
+        if (typeof (toStaticHTML) != 'undefined' && toStaticHTML != null) return toStaticHTML(htmlStr);
+        return htmlStr;
+    } catch (e) {
+        hjow_log(e);
+        return htmlStr;
+    }
+}
+
+h.toStaticHTML = hjow_toStaticHTML;

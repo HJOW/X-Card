@@ -1326,7 +1326,7 @@ class XCardGameEngine extends ModuleObject {
         bodyHtml += "<div class='page page_result'></div>\n";
         bodyHtml += "<div class='page page_set'></div>\n";
         bodyHtml += "<div class='toolbar'></div>\n";
-        jq('.xcard_place').html(bodyHtml);
+        jq('.xcard_place').html(hjow_toStaticHTML(bodyHtml));
 
         this.refreshPage();
     };
@@ -1644,14 +1644,14 @@ class XCardGameEngine extends ModuleObject {
     public refreshPage(heavyRefresh: boolean = true) {
         this.applyInputs();
         if (heavyRefresh) {
-            jq('.xcard_place .page_game').html(this.gamePageHTML());
-            jq('.xcard_place .page_main').html(this.mainPageHTML());
-            jq('.xcard_place .page_hide').html(this.hidePageHTML());
-            jq('.xcard_place .page_set').html(this.setPageHTML());
+            jq('.xcard_place .page_game').html(hjow_toStaticHTML(this.gamePageHTML()));
+            jq('.xcard_place .page_main').html(hjow_toStaticHTML(this.mainPageHTML()));
+            jq('.xcard_place .page_hide').html(hjow_toStaticHTML(this.hidePageHTML()));
+            jq('.xcard_place .page_set').html(hjow_toStaticHTML(this.setPageHTML()));
             // jq('.page_result').html(this.resultPageHTML()); // 아래쪽에서 처리
             this.prepareEvents();
         }
-        jq('.xcard_place .toolbar').html(this.toolbarHTML()); // 툴바는 항상 재로드
+        jq('.xcard_place .toolbar').html(hjow_toStaticHTML(this.toolbarHTML())); // 툴바는 항상 재로드
         if (this.needHideScreen) {
             jq('.xcard_place .page:not(.page_hide)').hide();
             this.refreshGame();
@@ -1666,7 +1666,7 @@ class XCardGameEngine extends ModuleObject {
             jq('.xcard_place .page_game').show();
         } else if (this.showResult) {
             jq('.xcard_place .page:not(.page_result)').hide();
-            jq('.xcard_place .page_result').html(this.resultPageHTML());
+            jq('.xcard_place .page_result').html(hjow_toStaticHTML(this.resultPageHTML()));
             this.refreshResult();
             jq('.xcard_place .page_result').show();
         } else {
@@ -1710,7 +1710,7 @@ class XCardGameEngine extends ModuleObject {
         results += "   </tr>" + "\n";
         results += "</table>" + "\n";
         results += "</div>" + "\n";
-        jq('.xcard_place .td_player_list').html(results);
+        jq('.xcard_place .td_player_list').html(hjow_toStaticHTML(results));
 
         var heightVal: number = jq('.xcard_place').height(); // window.innerHeight;
         if (heightVal < 200) heightVal = 200;
@@ -1721,7 +1721,7 @@ class XCardGameEngine extends ModuleObject {
         var selGameMode = jq('.xcard_place .sel_game_mode');
         selGameMode.find('option').remove();
         for (var mdx = 0; mdx < this.gameModeList.length; mdx++) {
-            selGameMode.append("<option value='" + mdx + "'>" + hjow_serializeXMLString(hjow_trans(this.gameModeList[mdx].getName())) + "</option>");
+            selGameMode.append(hjow_toStaticHTML("<option value='" + mdx + "'>" + hjow_serializeXMLString(hjow_trans(this.gameModeList[mdx].getName())) + "</option>"));
         }
         selGameMode.val(this.gameModeIndex);
         jq('.xcard_place .div_game_mode_desc').text(hjow_trans(this.gameModeList[this.gameModeIndex].getDescription()));
@@ -1801,13 +1801,13 @@ class XCardGameEngine extends ModuleObject {
             for (var rdx2 = 0; rdx2 < needAddInv.length; rdx2++) {
                 var targetCard: XCard = needAddInv[rdx2];
                 var newOptionHTML = "<option value='" + hjow_serializeString(targetCard.getUniqueId()) + "'>" + hjow_serializeXMLString(targetCard.toString()) + "</option>";
-                invenSel.append(newOptionHTML);
+                invenSel.append(hjow_toStaticHTML(newOptionHTML));
             }
 
             invenObjs = invenSel.find("option:not('.concealed')");
             var concealedOpt = invenSel.find("option.concealed");
             if (concealedOpt.length == 0) {
-                invenSel.append("<option value='' class='concealed'>[" + hjow_trans("Concealed") + "]</option>");
+                invenSel.append(hjow_toStaticHTML("<option value='' class='concealed'>[" + hjow_trans("Concealed") + "]</option>"));
                 concealedOpt = invenSel.find("option.concealed");
             }
             if (thisTurn && (!(playerOne.needToHideInventoryForSelf()))) {
@@ -1869,7 +1869,7 @@ class XCardGameEngine extends ModuleObject {
             for (var rdx4 = 0; rdx4 < needAddAff.length; rdx4++) {
                 var targetCard: XCard = needAddAff[rdx4];
                 var newOptionHTML = "<option value='" + hjow_serializeString(targetCard.getUniqueId()) + "'>" + hjow_serializeXMLString(targetCard.toString()) + "</option>";
-                affectorSel.append(newOptionHTML);
+                affectorSel.append(hjow_toStaticHTML(newOptionHTML));
             }
 
             affectorObjs = affectorSel.find("option");
