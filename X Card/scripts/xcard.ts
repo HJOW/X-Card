@@ -124,7 +124,7 @@ class Properties extends Uniqueable {
         this.entries = [];
     };
     public serialize(): string {
-        var results: Object = hjow_emptyObject();
+        var results: any = {};
         for (var idx: number = 0; idx < this.entries.length; idx++) {
             hjow_putOnObject(results, this.entries[idx].key, this.entries[idx].value);
         }
@@ -1143,6 +1143,8 @@ class XCardGameDefaultMode extends XCardGameMode {
 };
 
 class XCardGameEngine extends ModuleObject {
+    private version: string = "0.0.1";
+
     private gameModeList: XCardGameMode[] = [];
     private gameModeIndex: number = 0;
 
@@ -1173,8 +1175,9 @@ class XCardGameEngine extends ModuleObject {
         this.initDom();
         this.initTheme();
         this.title();
+        this.applyPropertiesFirst();
     };
-    private prepareFirstProp() {
+    protected prepareFirstProp() {
         this.deck = [];
         this.players = [];
 
@@ -1188,6 +1191,15 @@ class XCardGameEngine extends ModuleObject {
         this.players.push(new XCardAIPlayer("AI " + this.players.length));
 
         this.gameModeList.push(new XCardGameDefaultMode());
+    };
+    protected applyPropertiesFirst() {
+        var useAdvanceFeatOpt = this.getProperty("use_advanced_features");
+        if (useAdvanceFeatOpt != null) {
+            if (hjow_parseBoolean(useAdvanceFeatOpt)) jq('.xcard_place .advanceMode').show();
+            else jq('.xcard_place .advanceMode').hide();
+        } else {
+            jq('.xcard_place .advanceMode').hide();
+        }
     };
     initEngine() {
         this.prepareLanguageSets();
@@ -1206,7 +1218,7 @@ class XCardGameEngine extends ModuleObject {
         this.refreshPage();
     };
     initTheme() {
-        var themeStr = this.properties.get("theme");
+        var themeStr = this.getProperty("theme");
         if (themeStr == null) return;
 
         try {
@@ -1404,10 +1416,22 @@ class XCardGameEngine extends ModuleObject {
         this.deck = gameMode.deckList();
     };
     private save() {
-        hjow_saveOnLocalStorage('XCard', JSON.stringify(this.properties));
+        try {
+            hjow_saveOnLocalStorage('XCard', this.properties.serialize());
+        } catch (e) {
+            hjow_alert(e);
+        }
     };
     private load() {
-        this.properties.fromJSON(JSON.parse(hjow_getOnLocalStorage('XCard')));
+        var localStoreStr: string = hjow_getOnLocalStorage('XCard');
+        if (localStoreStr == null) {
+            this.save();
+        }
+        try {
+            this.properties.fromJSON(localStoreStr);
+        } catch (e) {
+            hjow_log(e);
+        }
     };
     private findPlayer(uniqueId: string): XCardPlayer {
         for (var idx = 0; idx < this.players.length; idx++) {
@@ -1999,7 +2023,11 @@ class XCardGameEngine extends ModuleObject {
             results += "</div>";
         }
         results += "<div class='toolbar_element'>";
-        results += "<span class='madeby'>Made by HJOW (hujinone22@naver.com)</span> <span class='version'></span>";
+        results += "<span class='madeby'>Made by HJOW (hujinone22@naver.com)</span>";
+        results += "</div>";
+
+        results += "<div class='toolbar_element right'>";
+        results += "<span class='version'>v" + this.version + "</span>";
         results += "</div>";
         
         return results;
