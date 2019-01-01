@@ -69,7 +69,7 @@ limitations under the License.
 
 .xcard_place div.player_arena_div {
     overflow-x: scroll;
-    overflow-y: hidden;
+    overflow-y: auto;
     min-height: 300px;
     width: 100%;
     height: 100%;
@@ -127,15 +127,15 @@ limitations under the License.
     max-height: 120px;
 }
 
-.xcard_place .table_each_player_result.order_player_0 {
+.xcard_place .table_each_player_result.order_player_1 {
     border: 3px solid gold;
 }
 
-.xcard_place .table_each_player_result.order_player_1 {
+.xcard_place .table_each_player_result.order_player_2 {
     border: 3px solid silver;
 }
 
-.xcard_place .table_each_player_result.order_player_2 {
+.xcard_place .table_each_player_result.order_player_3 {
     border: 3px solid orange;
 }
 
@@ -244,4 +244,27 @@ limitations under the License.
 
 .xcard_place .advanceMode {
     display: none;
+}
+
+.xcard_place .setting_list {
+    overflow-y: auto;
+}
+
+.xcard_place .setting_element {
+    padding: 5px 5px 5px 5px;
+    border: 1px solid lightgray;
+}
+
+.xcard_place .setting_element p {
+    font-size: 11px;
+}
+
+.xcard_place .div_game_mode_desc {
+    padding: 5px 5px 5px 5px;
+    font-size: 11px;
+}
+
+.xcard_place .tx_theme_script {
+    width: 100%;
+    min-height: 300px;
 }

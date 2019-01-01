@@ -51,7 +51,8 @@ function hjow_log(obj) {
 
 h.log = hjow_log;
 
-function hjow_alert(obj) {
+function hjow_alert(obj, title) {
+    hjow_log(obj);
     alert(obj);
 };
 
@@ -99,14 +100,33 @@ function hjow_removeItemFromArray(arr, itemIndex) {
 
 h.removeItemFromArray = hjow_removeItemFromArray;
 
+h.isLocalStorageOccurError = false;
+function hjow_checkLocalStorageAvailable() {
+    try {
+        localStorage.setItem('localStorageTestMessage', 'success');
+        return true;
+    } catch (e) {
+        h.isLocalStorageOccurError = true;
+        return false;
+    }
+};
+h.checkLocalStorageAvailable = hjow_checkLocalStorageAvailable;
+
 function hjow_saveOnLocalStorage(key, val) {
+    if (h.isLocalStorageOccurError) return;
     localStorage.setItem(key, val);
 };
 
 h.saveOnLocalStorage = hjow_saveOnLocalStorage;
 
 function hjow_getOnLocalStorage(key) {
-    return localStorage.getItem(key);
+    if (h.isLocalStorageOccurError) return null;
+    try {
+        return localStorage.getItem(key);
+    } catch (e) {
+        hjow_log(e);
+        return null;
+    }
 }
 
 h.getOnLocalStorage = hjow_getOnLocalStorage;
@@ -231,7 +251,7 @@ function hjow_accentElement(obj, seconds) {
     var timer = setTimeout(function () {
         if (firsts) {
             firsts = false;
-            continue;
+            return;
         }
         targetObj.removeClass('accents');
         clearTimeout(timer);
@@ -337,3 +357,9 @@ function hjow_string_to_date(dateStr) {
 }
 
 h.string_to_date = hjow_string_to_date;
+
+function hjow_isArray(a) {
+    return $.isArray(a);
+}
+
+h.isArray = hjow_isArray;
