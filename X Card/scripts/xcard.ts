@@ -139,19 +139,29 @@ class Properties extends Uniqueable {
 class TBigInt {
     protected bigIntObj: any = null;
     public constructor(obj: any) {
-        this.bigIntObj = hjow_bigint(obj);
+        if (obj instanceof TBigInt) {
+            this.bigIntObj = hjow_bigint(obj.bigIntObj);
+        } else {
+            this.bigIntObj = hjow_bigint(obj);
+        }
     }
     public add(otherObj: TBigInt): TBigInt {
-        return new TBigInt(hjow_bigint_add(this, otherObj));
+        return new TBigInt(hjow_bigint_add(this.bigIntObj, otherObj.bigIntObj));
     }
     public subtract(otherObj: TBigInt): TBigInt {
-        return new TBigInt(hjow_bigint_subtract(this, otherObj));
+        return new TBigInt(hjow_bigint_subtract(this.bigIntObj, otherObj.bigIntObj));
     }
     public multiply(otherObj: TBigInt): TBigInt {
-        return new TBigInt(hjow_bigint_multiply(this, otherObj));
+        return new TBigInt(hjow_bigint_multiply(this.bigIntObj, otherObj.bigIntObj));
     }
     public compare(otherObj: TBigInt): number {
-        return hjow_bigint_compare(this, otherObj);
+        return hjow_bigint_compare(this.bigIntObj, otherObj.bigIntObj);
+    }
+    public getNativeObject(): any {
+        return this.bigIntObj;
+    }
+    public toString(): string {
+        return this.bigIntObj.toString();
     }
 }
 
@@ -335,10 +345,10 @@ class ImportantTimer extends IntervalTimer {
 class XCard extends Uniqueable {
     public no: number = 0;
     public op: string = '';
-    public apply(beforeVal: any): any {
-        if (this.op == '+' || this.op == '＋') return hjow_bigint_add(hjow_bigint(beforeVal), hjow_bigint(this.no));
-        if (this.op == '-' || this.op == '－') return hjow_bigint_subtract(hjow_bigint(beforeVal), hjow_bigint(this.no));
-        if (this.op == '*' || this.op == '×') return hjow_bigint_multiply(hjow_bigint(beforeVal), hjow_bigint(this.no));
+    public apply(beforeVal: TBigInt): TBigInt {
+        if (this.op == '+' || this.op == '＋') return new TBigInt(beforeVal).add(new TBigInt(this.no));
+        if (this.op == '-' || this.op == '－') return new TBigInt(beforeVal).subtract(new TBigInt(this.no));
+        if (this.op == '*' || this.op == '×') return new TBigInt(beforeVal).multiply(new TBigInt(this.no));
 
         // if (this.op == '+' || this.op == '＋') return beforeVal + this.no;
         // if (this.op == '-' || this.op == '－') return beforeVal - this.no;
@@ -387,8 +397,8 @@ class XCard extends Uniqueable {
 
 class XCardPlayer extends Uniqueable {
     private name: string = "";
-    private inventory: XCard[] = [];
-    private applied: XCard[] = [];
+    protected inventory: XCard[] = [];
+    protected applied: XCard[] = [];
 
     constructor(name: string) {
         super();
@@ -560,10 +570,24 @@ class XCardPlayer extends Uniqueable {
         return this.pay(card, owner);
     };
     
-    public getCurrentPoint(gameMode: XCardGameMode): any {
-        var results: any = hjow_bigint(0);
+    public getCurrentPoint(gameMode: XCardGameMode): TBigInt {
+        var results: TBigInt = new TBigInt(0);
         for (var idx = 0; idx < this.applied.length; idx++) {
             var cardOne = this.applied[idx];
+            results = cardOne.apply(results);
+        }
+
+        return gameMode.processPoint(this, results);
+    };
+    public getCurrentPointIfPaid(gameMode: XCardGameMode, additionalCard: XCard): TBigInt {
+        var results: TBigInt = new TBigInt(0);
+        var simulatedApplied: XCard[] = [];
+        for (var idx = 0; idx < this.applied.length; idx++) {
+            simulatedApplied.push(this.applied[idx]);
+        }
+        simulatedApplied.push(additionalCard);
+        for (var idx = 0; idx < simulatedApplied.length; idx++) {
+            var cardOne = simulatedApplied[idx];
             results = cardOne.apply(results);
         }
 
@@ -587,7 +611,7 @@ class XCardPlayer extends Uniqueable {
     public needToHideInventoryForSelf(): boolean { // AI가 아닌 경우, 자기 자신 차례일 때는 인벤토리가 보여야 함
         return false;
     };
-    public actOnTurn(engine: XCardGameEngine, deck: XCard[], players: XCardPlayer[]) {
+    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[]) {
         if (engine == null) return;
         if (!(engine instanceof XCardGameEngine)) return;
 
@@ -722,10 +746,15 @@ class XCardAIPlayer extends XCardPlayer {
         if (!(engine instanceof XCardGameEngine)) return;
         this.customAIScript = scripts;
     };
-    public actOnTurn(engine: XCardGameEngine, deck: XCard[], players: XCardPlayer[]) {
+    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[]) {
         if (engine == null) return;
         if (!(engine instanceof XCardGameEngine)) return;
-        if (! engine.isActPlayerRequestAlive()) return;
+        if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return;
+
+        // 플레이어에게 주어지는 시간 (남은 시간과 1초정도 다를 수 있음)
+        var currentPlayerTime: number = mode.getEachPlayerTimeLimit(this, engine);
+        var timeLimitStd: number = Math.ceil(currentPlayerTime / 5.0);
+        if (timeLimitStd <= 2) timeLimitStd = 2;
 
         /////// AI 인공지능 처리 시작 ///////
         // 결과 변수 준비
@@ -738,7 +767,7 @@ class XCardAIPlayer extends XCardPlayer {
 
         /***********************************************
         // customAIScript 안에 들어갈 문자열 내용 샘플
-        var aiProcessFunction = function(engine, deck, players) { // deck 은 덱에 있는 카드 객체들의 배열, players 는 플레이어 객체들의 배열 (객체 안에서 필요한 데이터와 고유값에 액세스하면 됨)
+        var aiProcessFunction = function(engine, deck, players, currentPlayerTime) { // deck 은 덱에 있는 카드 객체들의 배열, players 는 플레이어 객체들의 배열 (객체 안에서 필요한 데이터와 고유값에 액세스하면 됨), currentPlayerTime 는 플레이어의 제한 시간
             var getDeck = true;              // 덱에서 카드를 받아야 할 때 true 지정 (다른 플레이어에게 카드를 놓아야 할 때는 반드시 false 로 지정할 것)
             var targetPlayerUniqueId = null; // 카드를 다른 플레이어에게 놓아야 할 때, 대상 플레이어의 고유값 지정
             var targetCardUniqueId   = null; // 카드를 다른 플레이어에게 놓아야 할 때, 대상 카드의 고유값 지정
@@ -764,7 +793,7 @@ class XCardAIPlayer extends XCardPlayer {
             } else if (resultObj.aiProcess == null || typeof (resultObj.aiProcess) == 'undefined') {
                 needDefaultCalc = true;
             } else {
-                resultObj = resultObj.aiProcess(engine, deck, players);
+                resultObj = resultObj.aiProcess(engine, deck, players, currentPlayerTime);
                 needToGetFromDeck = hjow_parseBoolean(resultObj.needToGetFromDeck);
                 targetPlayerUniqId = String(resultObj.targetPlayer);
                 targetCardUniqId = String(resultObj.targetCard);
@@ -773,42 +802,157 @@ class XCardAIPlayer extends XCardPlayer {
             }
         }
 
+        if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+
         if (needDefaultCalc) { // 기본 제공 인공지능 처리 로직
             // 사용 가능한 동작들을 다 배열에 넣어서 각각 수행 결과 이득 정도를 점수를 매겨 그중 높은 점수를 선택하도록 함 (난이도가 낮으면 랜덤하게 일정 확률로 덜 높은 점수의 동작을 선택하면 됨)
             var availableActions: XCardAIProcessAction[] = [];
             var oneAct: XCardAIProcessAction = null;
 
-            // 덱에서 카드를 받는 동작은 항상 사용가능 (단, 지금 다른 플레이어에 비해 불리한 상황이라면 점수를 낮게 책정함)
+            // 덱에서 카드를 받는 동작은 항상 사용가능 (단, 지금 다른 플레이어에 비해 불리한 상황이면서 덱에 남은 카드 수가 적으면, 점수를 낮게 책정함) --> 동작 수는 항상 1 이상
             oneAct = new XCardAIProcessAction();
             oneAct.card = null;
             oneAct.payTargetPlayerIndex = -1; // 덱에서 카드 받을 때는 -1
             oneAct.actionPlayerIndex = 0;
-
+            oneAct.calculatedAIPoint = new TBigInt(0);
+            var currentThisUserPoint = this.getCurrentPoint(mode);
+            if (deck.length < Math.ceil(players.length / 2.0)) { // 덱에 있는 카드 수가 매우 적으면 (플레이어 많으면 기준치를 적정량 늘려야 함)
+                for (var idx = 0; idx < players.length; idx++) {
+                    if (players[idx].getUniqueId() == this.getUniqueId()) continue;
+                    if (players[idx].getCurrentPoint(mode).compare(currentThisUserPoint) > 0) { // 다른 플레이어가 지금 이 플레이어보다 점수가 높음
+                        oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(players[idx].getCurrentPoint(mode).subtract(currentThisUserPoint)); // 다른 플레이어와 이 플레이어의 점수 차만큼 점수 제거
+                    }
+                    if (players[idx].getCurrentPoint(mode).compare(currentThisUserPoint) == 0) { // 다른 플레이어가 지금 이 플레이어와 점수가 동일
+                        oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(new TBigInt(1)); // 1점
+                    }
+                }
+            }
             availableActions.push(oneAct);
 
+            if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
 
+            // 다른 플레이어에게 카드를 줄 수 있는 모든 경우의 수 찾기
+            for (var cdx = 0; cdx < this.inventory.length; cdx++) {
+                var invCard: XCard = this.inventory[cdx];
+                for (var pdx = 0; pdx < players.length; pdx++) {
+                    var playerOne: XCardPlayer = players[pdx];
+                    var errMsg: string = playerOne.canPay(invCard, this);
+                    if (errMsg != null) continue; // 카드 내기가 불가능 - 사용 가능 동작에 등록하지 않음
+
+                    // 사용 가능 동작임이 확인됨, 동작 점수 계산
+                    var actionPoint: TBigInt = null;
+                    var simulatedPoint: TBigInt = playerOne.getCurrentPointIfPaid(mode, invCard); // 이 대상 플레이어의 변화결과 점수
+                    if (playerOne.getUniqueId() == this.getUniqueId()) {
+                        actionPoint = simulatedPoint;
+                    } else {
+                        actionPoint = simulatedPoint.multiply(new TBigInt(-1));
+                    } // 이 시점에서 actionPoint 는 null 이 아님
+                    for (var pdx2 = 0; pdx2 < players.length; pdx2++) {
+                        var playerAnother: XCardPlayer = players[pdx2];
+                        if (playerAnother.getUniqueId() == playerOne.getUniqueId()) continue; // 이미 계산한 플레이어는 점수 계산에서 제외
+
+                        if (playerAnother.getUniqueId() == this.getUniqueId()) {
+                            actionPoint = actionPoint.add(playerAnother.getCurrentPoint(mode));
+                        } else {
+                            actionPoint = actionPoint.subtract(playerAnother.getCurrentPoint(mode));
+                        }
+                    }
+
+                    oneAct = new XCardAIProcessAction();
+                    oneAct.card = invCard;
+                    oneAct.payTargetPlayerIndex = pdx;
+                    oneAct.actionPlayerIndex = 0;
+                    for (var pdx3 = 0; pdx3 < players.length; pdx3++) { // 자기자신의 인덱스를 알아내기 위함
+                        if (players[pdx3].getUniqueId() == this.getUniqueId()) {
+                            oneAct.actionPlayerIndex = pdx3;
+                            break;
+                        }
+                    }
+                    oneAct.calculatedAIPoint = actionPoint;
+                    availableActions.push(oneAct); // 동작에 추가
+
+                    if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+                    if (engine.getLeftTime() < timeLimitStd) break; // 시간 제한이 지나지는 않았으나 얼마 안남았으면 반복처리 중단, 지금까지의 연산 결과만 반영
+                }
+                if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+                if (engine.getLeftTime() < timeLimitStd) break; // 시간 제한이 지나지는 않았으나 얼마 안남았으면 반복처리 중단, 지금까지의 연산 결과만 반영
+            }
 
             // 동작들을 가지고 순서 매기기
             var orderedActions: XCardAIProcessAction[] = [];
             var maxPoints: TBigInt = new TBigInt("-99999999999999");
+            var maxIdx: number = -1;
+            var preventInfLoop: number = 0;
             while (availableActions.length >= 1) {
                 if (availableActions.length == 1) {
                     orderedActions.push(availableActions[0]);
+                    break;
                 } else {
-                    
+                    maxPoints = new TBigInt("-99999999999999");
+                    maxIdx = -1;
+                    for (var bdx = 0; bdx < availableActions.length; bdx++) {
+                        var currentAction = availableActions[bdx];
+                        if (maxPoints.compare(currentAction.calculatedAIPoint) < 0) {
+                            maxPoints = currentAction.calculatedAIPoint;
+                            maxIdx = bdx;
+                        }
+                    }
+                    orderedActions.push(availableActions[maxIdx]);
+                    hjow_removeItemFromArray(availableActions, maxIdx);
                 }
+
+                if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+
+                preventInfLoop++;
+                if (preventInfLoop >= 1000 * Math.max(availableActions.length, 1)) {
+                    hjow_log("Infinite Loop Detected");
+                    break;
+                }
+            }
+
+            if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+
+            // 동작들 중 실제 수행할 동작 선택
+            var selectedAct: XCardAIProcessAction = null;
+            var randomNo: number = Math.round(Math.random() * 100.0);
+            if (this.difficulty >= 3) { // 극한 (출력은 안함)
+                selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+            } else if (this.difficulty == 2) { // 어려움
+                if (randomNo >= 10) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+                else if (orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
+                else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+            } else if (this.difficulty >= 1) { // 보통
+                if (randomNo >= 50) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+                else if (randomNo >= 10 && orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
+                else if (orderedActions.length >= 3) selectedAct = orderedActions[2]; // 차차선
+                else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+            } else { // 쉬움
+                if (randomNo >= 65) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+                else if (randomNo >= 30 && orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
+                else if (randomNo >= 10 && orderedActions.length >= 3) selectedAct = orderedActions[2]; // 차차선
+                else if (randomNo >= 5  && orderedActions.length >= 4) selectedAct = orderedActions[3]; // 차차차선
+                else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+            }
+
+            // 동작 처리
+            if (selectedAct == null || selectedAct.payTargetPlayerIndex < 0) {
+                needToGetFromDeck = true;
+            } else {
+                needToGetFromDeck = false;
+                targetPlayerUniqId = players[selectedAct.payTargetPlayerIndex].getUniqueId();
+                targetCardUniqId = selectedAct.card.getUniqueId();
             }
         }
 
+        if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+
         // 계산 결과 집행
         if (needToGetFromDeck || targetPlayerUniqId == null || targetCardUniqId == null || targetPlayerUniqId == '' || targetCardUniqId == '') {
-            hjow_log("TURN ["+ this.getName() + "] : " + hjow_trans("Get one card from deck."));
             h.engine.events.game.btn_get_from_deck();
             return;
         }
         var errMsg = engine.payHere(targetPlayerUniqId, targetCardUniqId);
         if (errMsg != null) {
-            hjow_log("TURN ["+ this.getName() + "] : " + hjow_trans("Get one card from deck."));
             h.engine.events.game.btn_get_from_deck();
             return;
         }
@@ -942,7 +1086,7 @@ class XCardGameMode extends ModuleObject {
     public onFinishGame(engine: XCardGameEngine, players: XCardPlayer[], deckObj: XCard[]) { // 게임 끝나고 호출
 
     }
-    public processPoint(player:XCardPlayer, beforeCalculated: any): any { // 점수 계산 직후 점수에 추가 연산 (리턴된 값이 계산 결과로 적용됨 ! any타입 매개변수 객체로는 bigInt 객체가 들어올 예정)
+    public processPoint(player: XCardPlayer, beforeCalculated: TBigInt): TBigInt { // 점수 계산 직후 점수에 추가 연산 (리턴된 값이 계산 결과로 적용됨 ! any타입 매개변수 객체로는 bigInt 객체가 들어올 예정)
         return beforeCalculated;
     }
 };
@@ -985,6 +1129,7 @@ class XCardGameEngine extends ModuleObject {
     private showResult: boolean = false;
     private turnChanging: boolean = false;
     private actPlayerTurnRequest: boolean = false;
+    private actPlayerTurnStopRequest: boolean = false;
     private recordReplay: boolean = false;
     private replay: XCardReplay = null;
 
@@ -1098,7 +1243,7 @@ class XCardGameEngine extends ModuleObject {
                 if (selfObj.needHideScreen) return;
 
                 selfObj.actPlayerTurnRequest = false;
-                selfObj.players[selfObj.turnPlayerIndex].actOnTurn(selfObj, selfObj.deck, selfObj.players);
+                selfObj.players[selfObj.turnPlayerIndex].actOnTurn(selfObj, selfObj.gameModeList[selfObj.gameModeIndex], selfObj.deck, selfObj.players);
             }, 500);
         }
         
@@ -1113,6 +1258,7 @@ class XCardGameEngine extends ModuleObject {
         }
         
         this.refreshPage();
+        this.actPlayerTurnStopRequest = false;
         this.actPlayerTurnRequest = true;
     };
     private prepareRecordingReplay() {
@@ -1145,8 +1291,18 @@ class XCardGameEngine extends ModuleObject {
         }
     };
     public isActPlayerRequestAlive(): boolean {
-        return this.actPlayerTurnRequest;
+        return this.actPlayerTurnRequest && (!this.actPlayerTurnStopRequest);
     };
+    public isActPlayerStopRequested(): boolean {
+        return this.actPlayerTurnStopRequest;
+    };
+    public isThisTurn(player: XCardPlayer): boolean {
+        if (this.players[this.turnPlayerIndex].getUniqueId() == player.getUniqueId()) return true;
+        return false;
+    };
+    public getLeftTime(): number {
+        return this.turnPlayerTime;
+    }
     public isHided(): boolean {
         return this.needHideScreen;
     };
@@ -1156,6 +1312,7 @@ class XCardGameEngine extends ModuleObject {
     };
     private stopAllTimer() {
         var curIdx: number = 0;
+        var preventInfLoop: number = 0;
         while (curIdx < this.timers.length) {
             var timerOne: IntervalTimer = this.timers[curIdx];
             if (! (timerOne instanceof ImportantTimer)) {
@@ -1165,6 +1322,11 @@ class XCardGameEngine extends ModuleObject {
                 continue;
             }
             curIdx++;
+            preventInfLoop++;
+            if (preventInfLoop >= 1000 * Math.max(this.timers.length, 1)) {
+                hjow_log("Infinite Loop Detected");
+                break;
+            }
         }
     };
     private stopTimer(timerName: string): boolean {
@@ -1206,6 +1368,7 @@ class XCardGameEngine extends ModuleObject {
     };
     private nextTurn() {
         this.turnChanging = true;
+        this.actPlayerTurnStopRequest = true;
 
         var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
         gameMode.beforeNextTurnWork(this, this.players, this.deck);
@@ -1227,9 +1390,10 @@ class XCardGameEngine extends ModuleObject {
             this.turnPlayerIndex = 0;
         }
         this.turnPlayerTime = this.gameModeList[this.gameModeIndex].getEachPlayerTimeLimit(this.players[this.turnPlayerIndex], this);
-        // this.players[this.turnPlayerIndex].actOnTurn(this, this.deck, this.players); // 이 시점에서 AI 처리하면 안됨
+        // this.players[this.turnPlayerIndex].actOnTurn(this, this.gameModeList[this.gameModeIndex], this.deck, this.players); // 이 시점에서 AI 처리하면 안됨
 
         gameMode.afterNextTurnWork(this, this.players, this.deck);
+        this.actPlayerTurnStopRequest = false;
         this.actPlayerTurnRequest = true;
         this.turnChanging = false;
         this.refreshPage(false);
@@ -1245,6 +1409,7 @@ class XCardGameEngine extends ModuleObject {
     private finishGame(normalReason: boolean = false) {
         this.stopTimer("LimitTimer");
         this.stopTimer("AIProcessor");
+        this.actPlayerTurnStopRequest = true;
         this.gameStarted = false;
         this.needHideScreen = false;
         if (normalReason) {
@@ -1347,7 +1512,7 @@ class XCardGameEngine extends ModuleObject {
 
             var placeObj = jq(".xcard_place .pplace_" + hjow_serializeString(playerOne.getUniqueId()));
             placeObj.find(".player_inventory_card_count").text(playerOne.getInventoryCardCount());
-            placeObj.find(".point_number").text(playerOne.getCurrentPoint(this.gameModeList[this.gameModeIndex]));
+            placeObj.find(".point_number").text(playerOne.getCurrentPoint(this.gameModeList[this.gameModeIndex]).toString());
 
             // Inventory Synchronizing
             var invenSel = placeObj.find(".select_player_arena.inventory");
@@ -1490,7 +1655,7 @@ class XCardGameEngine extends ModuleObject {
             var playerBlock = jq(".xcard_place .presult_" + hjow_serializeString(playerOne.getUniqueId()));
             playerBlock.find(".i_name").val(playerOne.getName());
             playerBlock.find(".i_type").val(playerOne.getPlayerTypeName());
-            playerBlock.find(".i_point").val(String(playerOne.getCurrentPoint(gameMode)));
+            playerBlock.find(".i_point").val(playerOne.getCurrentPoint(gameMode).toString());
             playerBlock.find(".i_affects").val(playerOne.listAppliedAsString());
         }
         if (this.replay != null) this.resultReplay();
@@ -1585,6 +1750,7 @@ class XCardGameEngine extends ModuleObject {
             temps.push(this.players[tdx]);
         }
 
+        var preventInfLoop: number = 0;
         while (temps.length > 0) {
             var maxVal: string = null;
             var maxIdx: number = -1;
@@ -1595,7 +1761,7 @@ class XCardGameEngine extends ModuleObject {
             } else {
                 for (var tdx2 = 0; tdx2 < temps.length; tdx2++) {
                     var points = temps[tdx2].getCurrentPoint(gameMode);
-                    if (maxVal == null || hjow_bigint_compare(hjow_bigint(maxVal), points) < 0) {
+                    if (maxVal == null || new TBigInt(maxVal).compare(points) < 0) {
                         maxVal = String(points);
                         maxIdx = tdx2;
                     }
@@ -1603,6 +1769,12 @@ class XCardGameEngine extends ModuleObject {
             }
             playerOrders.push(temps[maxIdx]);
             hjow_removeItemFromArray(temps, maxIdx);
+
+            preventInfLoop++;
+            if (preventInfLoop >= 1000 * Math.max(temps.length, 1)) {
+                hjow_log("Infinite Loop Detected");
+                break;
+            }
         }
 
         for (var idx = 0; idx < playerOrders.length; idx++) {
@@ -1801,6 +1973,8 @@ class XCardGameEngine extends ModuleObject {
             }
         }
 
+        hjow_log("TURN [" + player.getName() + "] : " + hjow_replaceStr(hjow_replaceStr(hjow_trans("Pay the card '[[CARD]]' to the player '[[PLAYER]]'."), "[[CARD]]", targetCard.toString()), "[[PLAYER]]", targetPlayer.getName()));
+
         this.nextTurn();
         return null;
     }
@@ -1856,6 +2030,7 @@ class XCardGameEngine extends ModuleObject {
                 }
             }
 
+            hjow_log("TURN [" + player.getName() + "] : " + hjow_trans("Get one card from deck."));
             selfObj.nextTurn();
         };
         h.engine.events.game.btn_pay_here = function (playerUniqId: string) {
@@ -1940,6 +2115,8 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("7-Protected slot. Only the owner can pay here now.", "7 로 보호된 곳입니다. 마지막으로 7 카드가 놓인 곳에는 주인만 카드를 놓을 수 있습니다.");
         newLangSet.stringTable.set("The number, or the operation symbol should equal to the card [[LASTCARD]]", "마지막으로 놓인 카드([[LASTCARD]])와 숫자, 혹은 기호가 동일한 카드만 놓을 수 있습니다.");
         newLangSet.stringTable.set("Cannot pay multiple cards.", "여러 장의 카드를 동시에 놓을 수 없습니다.");
+        newLangSet.stringTable.set("Pay the card '[[CARD]]' to the player '[[PLAYER]]'.", "'[[CARD]]' 카드를 플레이어 '[[PLAYER]]' 에게 제출함");
+        newLangSet.stringTable.set("Get one card from deck.", "덱에서 카드를 한 장 받음");
         hjow_languageSets.push(newLangSet);
 
         
