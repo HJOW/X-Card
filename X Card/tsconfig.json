@@ -1,6 +1,6 @@
 {
   "compileOnSave": true,
-  "files": [ "scripts/hjow_common.js", "scripts/xcard.ts" ],
+  "files": [ "scripts/hjow_common.js", "scripts/xcard.ts", "scripts/not_opened.ts" ],
   "compilerOptions": {
     "noImplicitAny": false,
     "noEmitOnError": true,

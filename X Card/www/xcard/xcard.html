@@ -65,6 +65,10 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
             h.property.screenWidth = window.screenWidth;
             h.property.screenHeight = window.screenHeight;
 
+            if (typeof (hjow_processSecurityProcess) != 'undefined') {
+                hjow_processSecurityProcess();
+            }
+
             jq = jQuery;
             hjow_alert = hjow_dialogAlert;
             hjow_log = hjow_dialogLog;
