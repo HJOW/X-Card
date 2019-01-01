@@ -42,7 +42,10 @@ var jqo: Object = { // TypeScript 내에서 jQuery 사용을 위해 임시로 �
     removeClass: function (a: string) { return self; },
     addClass: function (a: string) { return self; },
     val: function (a: any) { return ""; },
-    length: 0
+    length: 0,
+    width: function (a: any) { return 0; },
+    height: function (a: any) { return 0; },
+    is: function (a: string) { return false; }
 };
 var jq: Function = function (obj: Object) {
     return jqo;
@@ -602,6 +605,12 @@ class XCardPlayer extends Uniqueable {
     public applyInputs(engine: XCardGameEngine, gameStarted: boolean, needHideScreen: boolean, showResult: boolean) {
 
     };
+    public refreshMain() {
+
+    };
+    public refreshGame() {
+
+    };
     public getPlayerTypeName(): string {
         return null;
     };
@@ -959,7 +968,10 @@ class XCardAIPlayer extends XCardPlayer {
         
     };
     public customMainHTML(): string {
-        var results: string = "<span class='label'>" + hjow_trans("Difficulty") + "</span> ";
+        var results: string = "";
+        results += "<div class='div_player_ai_custom'>";
+        results += "<div class='div_player_ai_custom_element'>";
+        results += "<span class='label'>" + hjow_trans("Difficulty") + "</span> ";
         results += "<select class='sel_ai_difficulty'>";
         for (var idx = 0; idx <= 2; idx++) {
             var difficultyStr: string = "";
@@ -969,15 +981,31 @@ class XCardAIPlayer extends XCardPlayer {
             results += "<option value='" + idx + "'>" + hjow_serializeXMLString(difficultyStr) + "</option>";
         }
         results += "</select>";
+        results += "</div>";
+        results += "<div class='div_player_ai_custom_element wide'>";
+        results += "<textarea class='tx_ai_script advanceMode' placeholder=\"" + hjow_serializeString("// " + hjow_trans("paste custom AI script here if you want")) + "\"></textarea>";
+        results += "</div>";
         return results;
+    };
+    public refreshMain() {
+        var playerBlock = jq(".xcard_place .pbasic_" + this.getUniqueId());
+        var textBlock = playerBlock.find('.tx_ai_script');
+        textBlock.val('');
+        if (this.customAIScript != null) textBlock.val(this.customAIScript);
     };
     public applyInputs(engine: XCardGameEngine, gameStarted: boolean, needHideScreen: boolean, showResult: boolean) {
         if (gameStarted) return;
         if (needHideScreen) return;
         if (showResult) return;
-        var playerBlock = jq(".pbasic_" + this.getUniqueId());
+        var playerBlock = jq(".xcard_place .pbasic_" + this.getUniqueId());
         var diff = playerBlock.find('.sel_ai_difficulty').val();
         this.difficulty = parseInt(diff);
+
+        var scriptInputs = String(playerBlock.find(".tx_ai_script").val());
+        scriptInputs = scriptInputs.trim();
+        if (scriptInputs != '') {
+            this.customAIScript = scriptInputs;
+        }
     };
     public toPlainObject(engine: XCardGameEngine): any {
         if (engine == null) return null;
@@ -1094,8 +1122,11 @@ class XCardGameMode extends ModuleObject {
 class XCardGameDefaultMode extends XCardGameMode {
     public constructor() {
         super();
-        this.name = "Normal";
-        this.desc = "X Card Game Normal Mode";
+        this.name = hjow_trans("Normal Mode");
+        this.desc = hjow_trans("Each player will get 10 cards at the game starts.");
+    };
+    protected playerStartCardCount(): number {
+        return 10;
     };
     public playerInvList(): XCard[] {
         var result: XCard[] = [];
@@ -1140,6 +1171,7 @@ class XCardGameEngine extends ModuleObject {
     public init() {
         this.initEngine();
         this.initDom();
+        this.initTheme();
         this.title();
     };
     private prepareFirstProp() {
@@ -1172,6 +1204,25 @@ class XCardGameEngine extends ModuleObject {
         jq('.xcard_place').html(bodyHtml);
 
         this.refreshPage();
+    };
+    initTheme() {
+        var themeStr = this.properties.get("theme");
+        if (themeStr == null) return;
+
+        try {
+            var theme: Properties = new Properties();
+            theme.fromJSON(themeStr);
+
+            var keys: string[] = theme.keyList();
+            for (var idx = 0; idx < keys.length; idx++) {
+                var keyOne = keys[idx];
+                var value = theme.get(keyOne);
+                var splits = value.split(':');
+                jq(keyOne).css(splits[0], splits[1]);
+            }
+        } catch (e) {
+            hjow_log(e);
+        }
     };
     private clearAllPlayers() {
         for (var idx = 0; idx < this.players.length; idx++) {
@@ -1470,7 +1521,7 @@ class XCardGameEngine extends ModuleObject {
         results += "          <select class='sel_player_type'>" + "\n";
         for (var tdx = 0; tdx < this.playerTypes.length; tdx++) {
             var playerType: XCardPlayerCreator = this.playerTypes[tdx];
-            results += "          <option value='" + hjow_serializeString(playerType.getTypeName()) + "'>" + hjow_serializeXMLString(playerType.getTypeName()) + "</option>" + "\n";
+            results += "          <option value='" + hjow_serializeString(playerType.getTypeName()) + "'>" + hjow_serializeXMLString(hjow_trans(playerType.getTypeName())) + "</option>" + "\n";
         }
         results += "          </select>" + "\n";
         results += "          <button type='button' class='btn_add_player' onclick='h.engine.events.main.btn_add_player(); return false;'>" + hjow_trans("Add") + "</button>" + "\n";
@@ -1485,11 +1536,22 @@ class XCardGameEngine extends ModuleObject {
         results += "</div>" + "\n";
         jq('.xcard_place .td_player_list').html(results);
 
-        var heightVal: number = window.innerHeight;
-        if (heightVal < 400) heightVal = 400;
+        var heightVal: number = jq('.xcard_place').height(); // window.innerHeight;
+        if (heightVal < 200) heightVal = 200;
         
         jq('.xcard_place .player_list_div').css('min-height', heightVal - 200 + 'px');
         jq('.xcard_place .player_list_div').css('max-height', heightVal - 100 + 'px');
+
+        var selGameMode = jq('.xcard_place .sel_game_mode');
+        selGameMode.find('option').remove();
+        for (var mdx = 0; mdx < this.gameModeList.length; mdx++) {
+            selGameMode.append("<option value='" + mdx + "'>" + hjow_serializeXMLString(this.gameModeList[mdx].getName()) + "</option>");
+        }
+        selGameMode.val(this.gameModeIndex);
+
+        for (var idx: number = 0; idx < this.players.length; idx++) {
+            this.players[idx].refreshMain();
+        }
     };
     private refreshGame() {
         jq('.xcard_place .table_player_arena_each').removeClass('current_turn');
@@ -1631,21 +1693,34 @@ class XCardGameEngine extends ModuleObject {
             }
         }
 
-        var heightVal: number = window.innerHeight;
-        if (heightVal < 400) heightVal = 400;
+        var heightVal: number = jq('.xcard_place').height(); // window.innerHeight;
+        if (heightVal < 500) heightVal = 500;
 
-        var widthVal: number = window.innerWidth;
-        if (widthVal < 400) widthVal = 400;
+        var widthVal: number = jq('.xcard_place').width(); // window.innerWidth;
+        if (widthVal < 700) widthVal = 700;
 
         jq('.xcard_place .player_arena_div').css('min-height', heightVal - 200 + 'px');
         jq('.xcard_place .player_arena_div').css('max-height', heightVal - 100 + 'px');
         jq('.xcard_place .player_arena_div').css('max-width', widthVal - 5 + 'px');
-        
-        jq('.xcard_place .td_select_container').each(function () {
-            var heightIn: number = jq(this).height();
-            if (heightIn < 300) heightIn = 300;
+
+        jq('.xcard_place .div_player_arena_each').css('min-height', heightVal - 210 + 'px');
+        jq('.xcard_place .div_player_arena_each').css('max-height', heightVal - 110 + 'px');
+
+        jq('.xcard_place .table_player_arena_each').css('min-height', heightVal - 220 + 'px');
+        jq('.xcard_place .table_player_arena_each').css('max-height', heightVal - 120 + 'px');
+
+        jq('.xcard_place .table_player_arena_each').each(function () {
+            var heightLefts: number = jq(jq(this).find('.player_arena_one_line_layout')[0]).height() * 4;
+            var thisHeight: number = jq(this).height();
+            if (thisHeight < 200) thisHeight = heightVal - 220;
+            var heightIn: number = thisHeight - heightLefts - 10;
+            if (heightIn < 200) heightIn = 250;
             jq(this).find('select').height(heightIn - 10);
         });
+
+        for (var idx: number = 0; idx < this.players.length; idx++) {
+            this.players[idx].refreshGame();
+        }
     };
     private refreshResult() {
         var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
@@ -1680,6 +1755,7 @@ class XCardGameEngine extends ModuleObject {
         results += "  </tr>" + "\n";
         results += "  <tr>" + "\n";
         results += "     <td class='td_game_start' style='height: 25px;'>" + "\n";
+        results += "        <select class='sel_game_mode'></select>" + "\n";
         results += "        <button type='button' class='btn_game_start' onclick='h.engine.events.main.btn_game_start(); return false;'>" + hjow_serializeXMLString(hjow_trans("Start Game")) + "</button>" + "\n";
         results += "     </td>" + "\n";
         results += "  </tr>" + "\n";
@@ -1750,6 +1826,7 @@ class XCardGameEngine extends ModuleObject {
             temps.push(this.players[tdx]);
         }
 
+        // 순위별로 플레이어 다시 정렬
         var preventInfLoop: number = 0;
         while (temps.length > 0) {
             var maxVal: string = null;
@@ -1777,9 +1854,17 @@ class XCardGameEngine extends ModuleObject {
             }
         }
 
+        var orderNo: number = 0;
+        var lastPlayerPoint: TBigInt = null;
         for (var idx = 0; idx < playerOrders.length; idx++) {
             var playerOne: XCardPlayer = playerOrders[idx];
-            results += "<table class='table_each_player_result presult_" + hjow_serializeString(playerOne.getUniqueId()) + " order_player_" + idx + "'>";
+            var playerPoint: TBigInt = playerOne.getCurrentPoint(this.gameModeList[this.gameModeIndex]);
+            if (lastPlayerPoint == null || lastPlayerPoint.compare(playerPoint) < 0) {
+                lastPlayerPoint = playerPoint;
+                orderNo++;
+            }
+
+            results += "<table class='table_each_player_result presult_" + hjow_serializeString(playerOne.getUniqueId()) + " order_player_" + orderNo + "'>";
             results += "   <tr>" + "\n";
             results += "      <td class='label'>" + "\n";
             results += "          <span class='label'>" + hjow_serializeXMLString(hjow_trans("Name")) + "</span>" + "\n";
@@ -1829,16 +1914,16 @@ class XCardGameEngine extends ModuleObject {
         var results: string = "";
         results += "<table class='full player_each'>" + "\n";
         results += "   <colgroup>" + "\n";
-        results += "       <col style='width:100px; min-width:70px;'/>" + "\n";
-        results += "       <col style='width:300px; min-width:300px;'/>" + "\n";
+        results += "       <col class='player_info_basic_label'/>" + "\n";
+        results += "       <col class='player_info_basic'/>" + "\n";
         results += "       <col />" + "\n";
         results += "   </colgroup>" + "\n";
         results += "   <tbody>" + "\n";
         results += "       <tr>" + "\n";
-        results += "          <td style='width:100px; min-width:70px;'>" + "\n";
+        results += "          <td class='player_info_basic_label'>" + "\n";
         results += "              <span class='label'>" + hjow_serializeXMLString(hjow_trans("Name")) + "</span>" + "\n";
         results += "          </td>" + "\n";
-        results += "          <td style='width:300px; min-width:300px;'>" + "\n";
+        results += "          <td class='player_info_basic'>" + "\n";
         results += "             <input type='text' class='inp_pname' name='pname_" + player.getUniqueId() + "' value='" + hjow_serializeString(player.getName()) + "'/>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td rowspan='2'>" + "\n";
@@ -1847,10 +1932,10 @@ class XCardGameEngine extends ModuleObject {
         results += "          </td>" + "\n";
         results += "       </tr>" + "\n";
         results += "       <tr>" + "\n";
-        results += "          <td style='width:100px; min-width:70px;'>" + "\n";
+        results += "          <td class='player_info_basic_label'>" + "\n";
         results += "              <span class='label'>" + hjow_serializeXMLString(hjow_trans("Type")) + "</span>" + "\n";
         results += "          </td>" + "\n";
-        results += "          <td style='width:300px; min-width:300px;'>" + "\n";
+        results += "          <td class='player_info_basic'>" + "\n";
         results += "             <span class='player_type'>" + player.getPlayerTypeName() + "</span>" + "\n";
         results += "          </td>" + "\n";
         results += "       </tr>" + "\n";
@@ -1909,10 +1994,13 @@ class XCardGameEngine extends ModuleObject {
     private toolbarHTML(): string {
         var results: string = "";
         if (this.gameStarted) {
+            results += "<div class='toolbar_element left'>";
             results += "<button type='button' onclick=\"h.engine.events.game.btn_game_stop(); return false;\">" + hjow_serializeXMLString(hjow_trans("Stop Game")) + "</button> ";
+            results += "</div>";
         }
-        
-        results += " <span class='madeby'>Made by HJOW (hujinone22@naver.com)</span> <span class='version'></span>";
+        results += "<div class='toolbar_element'>";
+        results += "<span class='madeby'>Made by HJOW (hujinone22@naver.com)</span> <span class='version'></span>";
+        results += "</div>";
         
         return results;
     }
@@ -1920,6 +2008,14 @@ class XCardGameEngine extends ModuleObject {
         if (this.gameStarted) return;
         if (this.needHideScreen) return;
         if (this.showResult) return;
+        if (jq('.xcard_place .page_main').is(':empty')) return;
+
+        var selGameMode = jq('.xcard_place .sel_game_mode');
+        var selectedGameModeVal = selGameMode.val();
+        if (selectedGameModeVal != null) { // 화면이 가려져 있으면 값을 못가져옴
+            this.gameModeIndex = parseInt(selectedGameModeVal);
+        }
+
         for (var idx = 0; idx < this.players.length; idx++) {
             var playerOne: XCardPlayer = this.players[idx];
             var playerBlock = jq(".xcard_place .pbasic_" + hjow_serializeString(playerOne.getUniqueId()));
@@ -2107,6 +2203,8 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Easy", "쉬움");
         newLangSet.stringTable.set("Normal", "보통");
         newLangSet.stringTable.set("Hard", "어려움");
+        newLangSet.stringTable.set("Player", "플레이어");
+        newLangSet.stringTable.set("AI", "AI");
         newLangSet.stringTable.set("Add", "추가");
         newLangSet.stringTable.set("Remove Last", "마지막 플레이어 삭제");
         newLangSet.stringTable.set("Difficulty", "난이도");
@@ -2117,6 +2215,9 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Cannot pay multiple cards.", "여러 장의 카드를 동시에 놓을 수 없습니다.");
         newLangSet.stringTable.set("Pay the card '[[CARD]]' to the player '[[PLAYER]]'.", "'[[CARD]]' 카드를 플레이어 '[[PLAYER]]' 에게 제출함");
         newLangSet.stringTable.set("Get one card from deck.", "덱에서 카드를 한 장 받음");
+        newLangSet.stringTable.set("Normal Mode", "기본 모드");
+        newLangSet.stringTable.set("Each player will get 10 cards at the game starts.", "각 플레이어는 게임 시작 시 10장의 카드를 가지고 시작합니다.");
+        newLangSet.stringTable.set("paste custom AI script here if you want", "직접 AI 인공지능 처리 스크립트를 사용하려면 이 곳에 붙여 넣으세요.");
         hjow_languageSets.push(newLangSet);
 
         
