@@ -385,6 +385,32 @@ function hjow_bigint_multiply(a, b) {
 
 h.bigint_multiply = hjow_bigint_multiply;
 
+function hjow_bigint_divide(a, b) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            return a / b;
+        } else {
+            return BigInt(a).divide(BigInt(b));
+        }
+    }
+    return bigInt(a).divide(bigInt(b));
+};
+
+h.bigint_divide = hjow_bigint_divide;
+
+function hjow_bigint_abs(a) {
+    if (typeof (bigInt) == 'undefined') {
+        if (typeof (BigInt) == 'undefined') {
+            return Math.abs(a);
+        } else {
+            return BigInt(a).abs();
+        }
+    }
+    return bigInt(a).abs();
+};
+
+h.bigint_abs = hjow_bigint_abs;
+
 function hjow_bigint_compare(a, b) {
     if (typeof (bigInt) == 'undefined') {
         if (typeof (BigInt) == 'undefined') {
@@ -486,3 +512,9 @@ function hjow_putEngine(engineObj) {
 }
 
 h.putEngine = hjow_putEngine;
+
+function hjow_replaceBr(str) {
+    return hjow_replaceStr(str, "\n", "<br/>");
+};
+
+h.replaceBr = hjow_replaceBr;

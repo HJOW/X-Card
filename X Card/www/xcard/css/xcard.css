@@ -3,7 +3,7 @@
 This JS library is made by HJOW.
 E-mail : hujinone22@naver.com
 
-This library need following libraries : jQuery UI, hjow_common.
+This css file need following libraries : jQuery UI, hjow_common.
 
 jQuery UI : https://jqueryui.com/
 */
@@ -22,44 +22,44 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-.xcard_place {
+.hjow_xcard_style_place {
     min-width: 790px;
     min-height: 590px;
 }
-.xcard_place div.debugMode, td.debugMode {
+.hjow_xcard_style_place div.debugMode, td.debugMode {
     border: 1px solid gray !important;
 }
 
-.xcard_place td.td_game_title {
+.hjow_xcard_style_place td.td_game_title {
     height: 30px;
 }
 
-.xcard_place td.td_game_title h2, td.td_game_title h1 {
+.hjow_xcard_style_place td.td_game_title h2, td.td_game_title h1 {
     font-size: 25px;
 }
 
-.xcard_place td.td_player {
+.hjow_xcard_style_place td.td_player {
     border: 2px solid gray;
 }
 
-.xcard_place td.td_player td{
+.hjow_xcard_style_place td.td_player td{
     border: 1px solid lightgray;
 }
 
-.xcard_place button.btn_game_start {
+.hjow_xcard_style_place button.btn_game_start {
     font-size: 20px;
 }
 
-.xcard_place td.td_player_list table.player_list tr:not(.tr_player_empty), td.td_player_list table.player_list td:not(.td_player_empty), td.td_player_list table.player_list table.player_each, td.td_player_list table.player_list table.player_each td {
+.hjow_xcard_style_place td.td_player_list table.player_list tr:not(.tr_player_empty), td.td_player_list table.player_list td:not(.td_player_empty), td.td_player_list table.player_list table.player_each, td.td_player_list table.player_list table.player_each td {
     width: 100%;
     max-height: 100px;
 }
 
-.xcard_place table.player_each {
+.hjow_xcard_style_place table.player_each {
     height: 60px;
 }
 
-.xcard_place div.player_list_div {
+.hjow_xcard_style_place div.player_list_div {
     overflow-x: hidden;
     overflow-y: scroll;
     min-height: 300px;
@@ -67,7 +67,7 @@ limitations under the License.
     border:1px solid black;
 }
 
-.xcard_place div.player_arena_div {
+.hjow_xcard_style_place div.player_arena_div {
     overflow-x: scroll;
     overflow-y: auto;
     min-height: 300px;
@@ -79,92 +79,92 @@ limitations under the License.
     flex-basis: 33%;
 }
 
-.xcard_place td.td_deck, td.td_game_status {
+.hjow_xcard_style_place td.td_deck, td.td_game_status {
     height: 30px;
 }
 
-.xcard_place td.td_player_arena_each, table.table_player_arena_each {
+.hjow_xcard_style_place td.td_player_arena_each, table.table_player_arena_each {
     min-height: 300px;
     min-width: 100px;
     max-width: 300px;
 }
 
-.xcard_place div.div_player_arena_each {
+.hjow_xcard_style_place div.div_player_arena_each {
     height: 100%;
     flex: 0 0 auto;
 }
 
-.xcard_place table.table_player_arena_each td {
+.hjow_xcard_style_place table.table_player_arena_each td {
     border: 1px solid lightgray;
 }
 
-.xcard_place select.select_player_arena {
+.hjow_xcard_style_place select.select_player_arena {
     width: 100%;
     height: 100%;
     min-width: 120px;
     min-height: 150px;
 }
 
-.xcard_place .player_arena_one_line_layout {
+.hjow_xcard_style_place .player_arena_one_line_layout {
     height: 30px;
 }
 
-.xcard_place table.table_player_arena_each.current_turn {
+.hjow_xcard_style_place table.table_player_arena_each.current_turn {
     border: 3px solid green;
 }
 
-.xcard_place table.table_player_arena_each:not(.current_turn) {
+.hjow_xcard_style_place table.table_player_arena_each:not(.current_turn) {
     border: 1px solid darkgray;
 }
 
-.xcard_place .progress {
+.hjow_xcard_style_place .progress {
     width: 100%;
 }
 
-.xcard_place .table_each_player_result {
+.hjow_xcard_style_place .table_each_player_result {
     border: 2px solid gray;
     width: 100%;
     max-height: 120px;
 }
 
-.xcard_place .table_each_player_result.order_player_1 {
+.hjow_xcard_style_place .table_each_player_result.order_player_1 {
     border: 3px solid gold;
 }
 
-.xcard_place .table_each_player_result.order_player_2 {
+.hjow_xcard_style_place .table_each_player_result.order_player_2 {
     border: 3px solid silver;
 }
 
-.xcard_place .table_each_player_result.order_player_3 {
+.hjow_xcard_style_place .table_each_player_result.order_player_3 {
     border: 3px solid orange;
 }
 
-.xcard_place .table_each_player_result.order_player_last {
+.hjow_xcard_style_place .table_each_player_result.order_player_last {
     border: 3px solid purple;
 }
 
-.xcard_place .table_each_player_result td {
+.hjow_xcard_style_place .table_each_player_result td {
     border: 1px solid lightgray;
 }
 
-.xcard_place .table_each_player_result td.label {
+.hjow_xcard_style_place .table_each_player_result td.label {
     width: 100px;
     max-width: 100px;
 }
 
-.xcard_place .table_each_player_result .i_name {
+.hjow_xcard_style_place .table_each_player_result .i_name {
     width: 100%;
 }
 
-.xcard_place .table_each_player_result .i_type {
+.hjow_xcard_style_place .table_each_player_result .i_type {
     width: 70px;
 }
 
-.xcard_place .table_each_player_result .i_affects {
+.hjow_xcard_style_place .table_each_player_result .i_affects {
     width: 100%;
 }
 
-.xcard_place .toolbar {
+.hjow_xcard_style_place .toolbar {
     width: 100%;
     max-height: 22px;
     background-color: aliceblue;
@@ -172,107 +172,108 @@ limitations under the License.
     padding: 0;
 }
 
-.xcard_place .toolbar .toolbar_element {
+.hjow_xcard_style_place .toolbar .toolbar_element {
     display:inline-block;
 }
 
-.xcard_place .toolbar .toolbar_element.left {
+.hjow_xcard_style_place .toolbar .toolbar_element.left {
     float: left;
 }
 
-.xcard_place .toolbar .toolbar_element.right {
+.hjow_xcard_style_place .toolbar .toolbar_element.right {
     float: right;
 }
 
-.xcard_place .toolbar button {
+.hjow_xcard_style_place .toolbar button {
     font-size: 10px;
     max-height: 15px;
 }
 
-.xcard_place .toolbar span {
+.hjow_xcard_style_place .toolbar span {
     margin: 0;
     font-size: 10px;
 }
 
-.xcard_place .replay_result {
+.hjow_xcard_style_place .replay_result {
     width: 100%;
     height: 100px;
     max-height: 100px;
     display: none;
 }
 
-.xcard_place .replay_json {
+.hjow_xcard_style_place .replay_json {
     width: 100%;
     height: 100%;
 }
 
-.xcard_place .div_player_ai_custom {
+.hjow_xcard_style_place .div_player_ai_custom {
     padding: 5px 5px 5px 5px;
     height: 100%;
 }
 
-.xcard_place .div_player_ai_custom_element {
+.hjow_xcard_style_place .div_player_ai_custom_element {
     display: inline-block;
     width: 150px;
     height: 100%;
     vertical-align: middle;
 }
 
-.xcard_place .div_player_ai_custom_element.wide {
+.hjow_xcard_style_place .div_player_ai_custom_element.wide {
     width: 200px;
 }
 
-.xcard_place .div_player_ai_custom_element span, .xcard_place .div_player_ai_custom_element select, .xcard_place .div_player_ai_custom_element textarea {
+.hjow_xcard_style_place .div_player_ai_custom_element span, .hjow_xcard_style_place .div_player_ai_custom_element select, .hjow_xcard_style_place .div_player_ai_custom_element textarea {
     vertical-align: middle;
 }
 
-.xcard_place .page_main .td_player td {
+.hjow_xcard_style_place .page_main .td_player td {
     padding: 5px 5px 5px 5px;
 }
 
-.xcard_place .tx_ai_script {
+.hjow_xcard_style_place .tx_ai_script {
     width: 100%;
     height: 100%;
     white-space: nowrap;
 }
 
-.xcard_place .page_main td.td_player_list table.player_list td.player_info_basic_label {
+.hjow_xcard_style_place .page_main td.td_player_list table.player_list td.player_info_basic_label {
     width: 100px;
     min-width: 70px;
 }
 
-.xcard_place .page_main td.td_player_list table.player_list td.player_info_basic {
+.hjow_xcard_style_place .page_main td.td_player_list table.player_list td.player_info_basic {
     width: 200px;
     min-width: 200px;
 }
 
-.xcard_place .advanceMode {
+.hjow_xcard_style_place .advanceMode {
     display: none;
 }
 
-.xcard_place .setting_list {
+.hjow_xcard_style_place .setting_list {
     overflow-y: auto;
 }
 
-.xcard_place .setting_element {
+.hjow_xcard_style_place .setting_element {
     padding: 5px 5px 5px 5px;
     border: 1px solid lightgray;
 }
 
-.xcard_place .setting_element p {
+.hjow_xcard_style_place .setting_element p {
     font-size: 11px;
 }
 
-.xcard_place .setting_element.setting_buttons_bottom {
+.hjow_xcard_style_place .setting_element.setting_buttons_bottom {
     border: 0;
 }
 
-.xcard_place .div_game_mode_desc {
+.hjow_xcard_style_place .div_game_mode_desc {
     padding: 5px 5px 5px 5px;
     font-size: 11px;
 }
 
-.xcard_place .tx_theme_script {
+.hjow_xcard_style_place .tx_theme_script {
     width: 100%;
-    min-height: 300px;
+    min-height: 100px;
+    height: 120px;
 }
