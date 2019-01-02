@@ -26,6 +26,9 @@
    The cards used in this game are represented by numbers between -1 and 10, and three symbols (＋－×);
    As such, there are 33 different types of cards in a set of cards.
    
+   Example)
+      Player 1 have 4 cards like... [＋1][＋5][－4][×(-1)]
+   
    
    게임에서는 플레이어 수 만큼의 세트의 카드들을 사용합니다.
    예를 들어, 2명의 플레이어가 있다면 66장의 카드로 게임을 진행합니다.   
