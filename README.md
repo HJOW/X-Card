@@ -27,7 +27,7 @@
    As such, there are 33 different types of cards in a set of cards.
    
    Example)
-      Player 1 have 4 cards like... [＋1][＋5][－4][×(-1)]
+      Player 1 have... [＋1] [＋5] [－4] [×(-1)]
    
    
    게임에서는 플레이어 수 만큼의 세트의 카드들을 사용합니다.
