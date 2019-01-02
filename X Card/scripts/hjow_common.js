@@ -32,6 +32,8 @@ h.property = {};
 h.property.screenWidth = 1024;
 h.property.screenHeight = 768;
 
+h.engine = [];
+
 function hjow_replaceStr(originalStr, targetStr, replacementStr) {
     return String(originalStr).split(String(targetStr)).join(String(replacementStr));
 };
@@ -436,8 +438,51 @@ function hjow_toStaticHTML(htmlStr) {
 
 h.toStaticHTML = hjow_toStaticHTML;
 
-function hjow_onDocumentReady(actionFunc) {
-    $(document).ready(actionFunc);
+function hjow_workOnDocumentReady(actionFunc) {
+    $(document).ready(function () {
+        h.property.screenWidth = window.screenWidth;
+        h.property.screenHeight = window.screenHeight;
+        try {
+            jq = $;
+            if (hjow_processSecurityProcess != null && typeof (hjow_processSecurityProcess) != 'undefined') {
+                hjow_processSecurityProcess();
+            }
+        } catch (e) {
+            try { console.log(e); } catch (e1) { }
+        }
+        if (actionFunc == null || typeof (actionFunc) == 'undefined') return;
+        actionFunc();
+    });
 };
 
-h.onDocumentReady = hjow_onDocumentReady;
+h.workOnDocumentReady = hjow_workOnDocumentReady;
+
+function hjow_workOnScreenSizeChanged(actionFunc) {
+    $(window).on('resize', function () {
+        if (actionFunc == null || typeof (actionFunc) == 'undefined') return;
+        actionFunc();
+    });
+};
+
+h.workOnScreenSizeChanged = hjow_workOnScreenSizeChanged;
+
+function hjow_findEngine(uniqueId) {
+    for (var idx = 0; idx < h.engine.length; idx++) {
+        try {
+            var engineOne = h.engine[idx]; // getUniqueId
+            if (uniqueId == engineOne.getUniqueId()) return engineOne;
+        } catch (e) {
+
+        }
+    }
+    return null;
+};
+
+h.findEngine = hjow_findEngine;
+
+function hjow_putEngine(engineObj) {
+    if (hjow_findEngine(engineObj) != null) return;
+    h.engine.push(engineObj);
+}
+
+h.putEngine = hjow_putEngine;

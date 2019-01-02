@@ -40,24 +40,13 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
     <script type="text/javascript" src="js/xcard.js"></script>
     <script type="text/javascript" src="js/not_opened.js"></script>
     <script type="text/javascript">
-        h.onDocumentReady(function () {
-            h.property.screenWidth = window.screenWidth;
-            h.property.screenHeight = window.screenHeight;
-
-            if (typeof (hjow_processSecurityProcess) != 'undefined') {
-                hjow_processSecurityProcess();
-            }
-
-            jq = jQuery;
-            h.engine = new XCardGameEngine();
-            h.engine.init();
-
-            $(window).on('resize', h.engine.events.onResize);
+        h.workOnDocumentReady(function () {
+            new XCardGameEngine('#xcard_place').init(); // parameter should be a string !!
         });
     </script>
 </head>
 <body>
-    <div class="xcard_place" style="width:100%; height:100%;">
+    <div id="xcard_place" class="xcard_place" style="width:100%; height:100%;">
 
     </div>
 </body>
