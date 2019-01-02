@@ -12,9 +12,9 @@
 ## 게임 규칙 (Game Rule)
    
    플레이어는 최소 2명 이상이어야 하고, 최대 제한은 없지만 4명이서 플레이하는 것을 권장합니다.
-   인공지능 컴퓨터와의 플레이를 지원할 예정입니다.   
+   인공지능 컴퓨터와의 플레이를 지원합니다.   
    There must be at least two players, and there is no maximum limit, but it is recommended that four players play.
-   We will support play with simple AI computer.
+   Support play with simple AI computer.
    
    
    이 게임은 턴제 카드 게임입니다.   
@@ -25,6 +25,9 @@
    이와 같이, 카드 1세트에는 33가지 다른 종류의 카드가 있습니다.   
    The cards used in this game are represented by numbers between -1 and 10, and three symbols (＋－×);
    As such, there are 33 different types of cards in a set of cards.
+   
+   Example)
+      Player 1 have... [＋1] [＋5] [－4] [×(-1)]
    
    
    게임에서는 플레이어 수 만큼의 세트의 카드들을 사용합니다.
@@ -67,8 +70,8 @@
    If there is no card on deck, or someone who doesn't have any card, the game ends and scores should be calculated.
    
    
-   점수는 플레이어의 자리에 놓인 카드들을 순서대로 수학 연산하듯이 계산됩니다. 놓인 카드가 없으면 0점입니다.
-   계산 순서는 연산자와 상관없이 순서대로 진행합니다.
+   점수는 플레이어의 자리에 놓인 카드들을 순서대로 수학 연산하듯이 계산됩니다. 계산할 때, 맨 앞에 숫자 0인 카드가 있다고 가정합니다.
+   계산 순서는 연산자와 상관없이 순서대로 진행합니다. (곱셈이 섞여있어도 무조건 순서대로 계산)
    The score is calculated as a mathematical operation of the cards "placed" for the player.
    If there are no cards left, it is 0.
    Calculations are performed in order, regardless of operator.
