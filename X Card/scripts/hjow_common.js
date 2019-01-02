@@ -39,24 +39,84 @@ function hjow_replaceStr(originalStr, targetStr, replacementStr) {
 h.replaceStr = hjow_replaceStr;
 
 h.property.logFormat = '[%TODAY%] %LOG%';
+h.logAppendee = null;
 
 function hjow_log(obj) {
     if (typeof (console) == 'undefined') return;
     if (typeof (console.log) == 'undefined') return;
     var contents = String(h.property.logFormat);
-    contents = h.replaceStr(contents, '%TODAY%', String(new Date()));
+    contents = h.replaceStr(contents, '%TODAY%', hjow_date_to_string(new Date()));
     contents = h.replaceStr(contents, '%LOG%', String(obj));
     console.log(contents);
+    if (h.logAppendee != null && typeof (h.logAppendee) != 'undefined') {
+        $(h.logAppendee).append(contents);
+        $(h.logAppendee).append("\n");
+    }
 };
 
 h.log = hjow_log;
 
+function hjow_prepareDialogLog() {
+    if ($('.div_hjow_dialog_console .tf_hjow_console').length <= 0) {
+        var logDialogHTML = "<div class='div_hjow_dialog_console' title='Log'>";
+        logDialogHTML += "<textarea class='tf_hjow_console' readonly='readonly'></textarea>";
+        logDialogHTML += "</div>";
+        $('body').append(hjow_toStaticHTML(logDialogHTML));
+    }
+    
+    h.logAppendee = $('.div_hjow_dialog_console .tf_hjow_console');
+};
+
+h.prepareDialogLog = hjow_prepareDialogLog;
+
+function hjow_openLogDialog() {
+    if ($('.div_hjow_dialog_console').length <= 0) return;
+    $('.div_hjow_dialog_console').dialog({
+        width: 450,
+        height: 300
+    });
+    $('.div_hjow_dialog_console').css('overflow', 'hidden');
+};
+
+h.openLogDialog = hjow_openLogDialog;
+
+function hjow_deleteLogDialog() {
+    if (h.logAppendee == null || typeof (h.logAppendee) == 'undefined') return;
+    $(h.logAppendee).empty();
+    try { $(h.logAppendee).val(""); } catch (e) { }
+};
+
+h.deleteLogDialog = hjow_deleteLogDialog;
+
+h.alertFunction = null;
+
 function hjow_alert(obj, title) {
     hjow_log(obj);
+    if (h.alertFunction != null && typeof (h.alertFunction) != 'undefined') {
+        h.alertFunction(obj, title);
+        return;
+    }
     alert(obj);
 };
 
 h.alert = hjow_alert;
+
+function hjow_prepareDialogAlert() {
+    if ($('.div_hjow_dialog_alert').length <= 0) {
+        var logDialogHTML = "<div class='div_hjow_dialog_alert' style='display: none;' title='Alert'>";
+        logDialogHTML += "</div>";
+        $('body').append(hjow_toStaticHTML(logDialogHTML));
+    }
+    h.alertFunction = function (msg, title) {
+        var dialogObj = $('.div_hjow_dialog_alert');
+        if (title == null || (typeof (title) == 'undefined')) title = "Message";
+        dialogObj.attr('title', String(title));
+        dialogObj.text(String(msg));
+        dialogObj.dialog();
+    };
+};
+
+h.prepareDialogAlert = hjow_prepareDialogAlert;
 
 h.property.debugMode = false;
 
@@ -306,7 +366,7 @@ function hjow_bigint_subtract(a, b) {
         }
     }
     return bigInt(a).subtract(bigInt(b));
-}
+};
 
 h.bigint_subtract = hjow_bigint_subtract;
 
@@ -319,7 +379,7 @@ function hjow_bigint_multiply(a, b) {
         }
     }
     return bigInt(a).multiply(bigInt(b));
-}
+};
 
 h.bigint_multiply = hjow_bigint_multiply;
 
@@ -334,13 +394,13 @@ function hjow_bigint_compare(a, b) {
         }
     }
     return bigInt(a).compare(bigInt(b));
-}
+};
 
 h.bigint_compare = hjow_bigint_compare;
 
 function hjow_date_to_string(dateObj) {
     return dateObj.getFullYear() + "." + (dateObj.getMonth() + 1) + "." + dateObj.getDate() + "." + dateObj.getHours() + "." + dateObj.getMinutes() + "." + dateObj.getSeconds();
-}
+};
 
 h.date_to_string = hjow_date_to_string;
 
@@ -354,13 +414,13 @@ function hjow_string_to_date(dateStr) {
     result.setMinutes(parseInt(stringSplits[4]));
     result.setSeconds(parseInt(stringSplits[5]));
     return result;
-}
+};
 
 h.string_to_date = hjow_string_to_date;
 
 function hjow_isArray(a) {
     return $.isArray(a);
-}
+};
 
 h.isArray = hjow_isArray;
 
@@ -372,6 +432,12 @@ function hjow_toStaticHTML(htmlStr) {
         hjow_log(e);
         return htmlStr;
     }
-}
+};
 
 h.toStaticHTML = hjow_toStaticHTML;
+
+function hjow_onDocumentReady(actionFunc) {
+    $(document).ready(actionFunc);
+};
+
+h.onDocumentReady = hjow_onDocumentReady;

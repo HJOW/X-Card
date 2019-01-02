@@ -139,6 +139,10 @@ limitations under the License.
     border: 3px solid orange;
 }
 
+.xcard_place .table_each_player_result.order_player_last {
+    border: 3px solid purple;
+}
+
 .xcard_place .table_each_player_result td {
     border: 1px solid lightgray;
 }
@@ -257,6 +261,10 @@ limitations under the License.
 
 .xcard_place .setting_element p {
     font-size: 11px;
+}
+
+.xcard_place .setting_element.setting_buttons_bottom {
+    border: 0;
 }
 
 .xcard_place .div_game_mode_desc {

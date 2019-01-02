@@ -31,37 +31,16 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
     <link rel="stylesheet" type="text/css" href="jquery_ui/jquery-ui.css" />
     <link rel="stylesheet" type="text/css" href="css/hjow_common.css" />
     <link rel="stylesheet" type="text/css" href="css/xcard.css" />
+    <script type="text/javascript" src="../cordova.js"></script>
+    <script type="text/javascript" src="../scripts/platformOverrides.js"></script>
     <script type="text/javascript" src="js/jquery/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="jquery_ui/jquery-ui.js"></script>
     <script type="text/javascript" src="js/BigInteger.min.js"></script>
     <script type="text/javascript" src="js/hjow_common.js"></script>
     <script type="text/javascript" src="js/xcard.js"></script>
+    <script type="text/javascript" src="js/not_opened.js"></script>
     <script type="text/javascript">
-        function hjow_dialogAlert(msg, title) {
-            var dialogObj = $('#jquery_dialog_alert');
-            if (title == null || (typeof (title) == 'undefined')) title = "Message";
-            hjow_log(msg);
-            dialogObj.attr('title', String(title));
-            dialogObj.text(String(msg));
-            dialogObj.dialog();
-        };
-        var hjow_backupLogFunc = hjow_log;
-        function hjow_dialogLog(msg, title) {
-            $('#tf_console').append(msg + "\n");
-            hjow_backupLogFunc(msg);
-        };
-        function hjow_openLogDialog() {
-            $('#jquery_dialog_console').dialog({
-                width: 450,
-                height: 300
-            });
-        };
-        function hjow_deleteLogDialog() {
-            $('#tf_console').empty();
-            $('#tf_console').val("");
-        };
-        $(document).ready(function () {
-            // h.debugMode();
+        h.onDocumentReady(function () {
             h.property.screenWidth = window.screenWidth;
             h.property.screenHeight = window.screenHeight;
 
@@ -70,15 +49,6 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
             }
 
             jq = jQuery;
-            hjow_alert = hjow_dialogAlert;
-            hjow_log = hjow_dialogLog;
-            hjow_onRefreshComponents = function () {
-                $('.btn_show_log').remove();
-                $('.btn_delete_log').remove();
-                $('.xcard_place .toolbar_buttons').append("<button type='button' class='btn_show_log' onclick='hjow_openLogDialog(); return false;'>" + hjow_trans("Show Log") + "</button>");
-                $('.xcard_place .toolbar_buttons').append("<button type='button' class='btn_delete_log' onclick='hjow_deleteLogDialog(); return false;'>" + hjow_trans("Delete Log") + "</button>");
-            };
-
             h.engine = new XCardGameEngine();
             h.engine.init();
 
@@ -89,12 +59,6 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
 <body>
     <div class="xcard_place" style="width:100%; height:100%;">
 
-    </div>
-    <div id="jquery_dialog_alert" style="display:none;">
-
-    </div>
-    <div id="jquery_dialog_console" style="display:none;" title="Log">
-        <textarea style="width: 100%; height: 100%; white-space: nowrap;" id="tf_console" readonly></textarea>
     </div>
 </body>
 </html>
