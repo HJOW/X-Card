@@ -1535,14 +1535,20 @@ class XCardGameEngine extends ModuleObject {
     private actPlayerTurnStopRequest: boolean = false;
     private replay: XCardReplay = null;
     private showSettings: boolean = false;
+    private debugMode: boolean = false;
 
-    public constructor(plcArea: string = '.hjow_xcard_style_place') {
+    public constructor(plcArea: string = '.hjow_xcard_style_place', debugMode: boolean = false) {
         super("X Card", "X Card Game Core Engine");
         if (typeof (plcArea) != 'string') {
             hjow_log('The parameter should be a string which is jQuery-selector form.');
         }
         this.placeArea = String(plcArea);
         hjow_prepareJQuery();
+        this.debugMode = debugMode;
+        if (debugMode) {
+            hjow_putEngine(this);
+            jq('body').css('overflow-y', 'scroll');
+        }
     };
     public getClassName(): string {
         return "XCardGameEngine";
@@ -1773,6 +1779,7 @@ class XCardGameEngine extends ModuleObject {
         }
 
         hjow_log(hjow_trans("Game is started."));
+        if (this.isDebugMode) hjow_log(hjow_trans("Debug mode was activated."));
         hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.players[this.turnPlayerIndex].getName()));
         
         this.refreshPage();
@@ -1965,9 +1972,13 @@ class XCardGameEngine extends ModuleObject {
         gameMode.onFinishGame(this, this.players, this.deck);
 
         hjow_log(hjow_trans("Game is finished."));
+        if (this.isDebugMode) hjow_log(hjow_trans("Debug mode was activated."));
         
         this.refreshPage(false);
         this.replay = null; // 화면 리프레시 이후에 리플레이 초기화 (결과 화면에서 리플레이 JSON 출력 후에 초기화하기 위함)
+    };
+    public isDebugMode(): boolean {
+        return this.debugMode;
     };
     public refreshPage(heavyRefresh: boolean = true) {
         this.applyInputs();
@@ -1984,10 +1995,6 @@ class XCardGameEngine extends ModuleObject {
             jq(this.placeArea).find('.page:not(.page_hide)').hide();
             this.refreshGame();
             jq(this.placeArea).find('.page_hide').show();
-        } else if (this.showSettings) {
-            jq(this.placeArea).find('.page:not(.page_set)').hide();
-            this.refreshSettingPage();
-            jq(this.placeArea).find('.page_set').show();
         } else if (this.gameStarted) {
             jq(this.placeArea).find('.page:not(.page_game)').hide();
             this.refreshGame();
@@ -1997,16 +2004,28 @@ class XCardGameEngine extends ModuleObject {
             jq(this.placeArea).find('.page_result').html(hjow_toStaticHTML(this.resultPageHTML()));
             this.refreshResult();
             jq(this.placeArea).find('.page_result').show();
+        } else if (this.showSettings && (!this.debugMode)) {
+            jq(this.placeArea).find('.page:not(.page_set)').hide();
+            this.refreshSettingPage();
+            jq(this.placeArea).find('.page_set').show();
         } else {
             jq(this.placeArea).find('.page:not(.page_main)').hide();
             this.refreshMain();
             jq(this.placeArea).find('.page_main').show();
+        }
+        if (this.showSettings && this.debugMode) {
+            this.refreshSettingPage();
+            jq(this.placeArea).find('.page_set').show();
         }
         if (hjow_onRefreshComponents != null && typeof (hjow_onRefreshComponents) != 'undefined') {
             hjow_onRefreshComponents();
         }
         this.initTheme(2, false);
         this.refreshEvents();
+        if (this.debugMode) {
+            this.refreshSettingPage();
+            jq(this.placeArea).find('.btn_go_setting').show();
+        }
     };
     private refreshMain() {
         jq(this.placeArea).find('.td_player_list').empty();
@@ -2680,13 +2699,14 @@ class XCardGameEngine extends ModuleObject {
         results += "<div class='element e127 toolbar_element left toolbar_buttons'>";
         if (this.gameStarted) {
             results += "<button type='button' class='element e128 btn_stop_game'>" + hjow_serializeXMLString(hjow_trans("Stop Game")) + "</button> ";
-        } else if (!(this.showResult || this.needHideScreen || this.showSettings)) {
-            results += "<button type='button' class='element e129 btn_go_setting'>" + hjow_serializeXMLString(hjow_trans("Settings")) + "</button> ";
         } else if (this.showSettings) {
             results += "<button type='button' class='element e130 btn_go_main'>" + hjow_serializeXMLString(hjow_trans("Go back to main")) + "</button> ";
         }
         if (jq('.hjow_xcard_how_to_play_dialog').length >= 1) { // 플레이 영역 밖에 있는 영역임 !
             results += "   <button type='button' class='element e146 btn_show_how_to'> " + hjow_serializeXMLString(hjow_trans("How to play")) + "</button>";
+        }
+        if ((!(this.showResult || this.needHideScreen || this.showSettings)) || this.isDebugMode) {
+            results += "<button type='button' class='element e129 btn_go_setting'>" + hjow_serializeXMLString(hjow_trans("Settings")) + "</button> ";
         }
         results += "   <button type='button' class='element e131 btn_show_log'> " + hjow_serializeXMLString(hjow_trans("Show Log")) + "</button>";
         results += "   <button type='button' class='element e132 btn_delete_log'>" + hjow_serializeXMLString(hjow_trans("Delete Log")) + "</button>";
@@ -2966,15 +2986,19 @@ class XCardGameEngine extends ModuleObject {
         };
         selfAny.events.main.btn_go_settings = function () {
             selfObj.showSettings = true;
-            selfObj.needHideScreen = false;
-            selfObj.showResult = false;
+            if (!selfObj.isDebugMode()) {
+                selfObj.needHideScreen = false;
+                selfObj.showResult = false;
+            }
             selfObj.refreshPage();
         };
         selfAny.events.main.btn_go_main = function () {
             selfObj.showSettings = false;
-            selfObj.showResult = false;
-            selfObj.needHideScreen = false;
-            selfObj.gameStarted = false;
+            if (! selfObj.isDebugMode()) {
+                selfObj.showResult = false;
+                selfObj.needHideScreen = false;
+                selfObj.gameStarted = false;
+            }
             selfObj.refreshPage();
         };
         selfAny.events.main.btn_save_settings = function () {
@@ -2983,7 +3007,12 @@ class XCardGameEngine extends ModuleObject {
             }
 
             selfObj.applySettings();
-            selfAny.events.main.btn_go_main();
+            if (selfObj.isDebugMode()) {
+                selfObj.showSettings = false;
+                selfObj.refreshPage(false);
+            } else {
+                selfAny.events.main.btn_go_main();
+            }
             selfObj.applyProperties();
         };
         selfAny.events.main.sel_mode_changed = function () {
@@ -3210,6 +3239,7 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Your turn, [[PLAYER]].", "[[PLAYER]] 의 차례입니다.");
         newLangSet.stringTable.set("Game is finished.", "게임이 끝났습니다.");
         newLangSet.stringTable.set("See Record", "기록 보기");
+        newLangSet.stringTable.set("Debug mode was activated.", "디버그 모드 활성화됨");
         newLangSet.stringTable.set("Please add player to play.", "게임 시작 전 플레이어를 추가해 주세요.");
         newLangSet.stringTable.set("Please select correct player type.", "올바른 플레이어 타입을 선택해 주세요.");
         newLangSet.stringTable.set("Try this first to learn about this game.", "게임을 배우기 위해 이 모드를 처음 플레이하세요.");
