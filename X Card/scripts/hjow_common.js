@@ -43,20 +43,35 @@ h.replaceStr = hjow_replaceStr;
 h.property.logFormat = '[%TODAY%] %LOG%';
 h.logAppendee = null;
 
-function hjow_log(obj) {
+function hjow_rawLog(obj, showDetailOnBrowserConsole, showDetailOnComp) {
     if (typeof (console) == 'undefined') return;
     if (typeof (console.log) == 'undefined') return;
     var contents = String(h.property.logFormat);
     contents = h.replaceStr(contents, '%TODAY%', hjow_date_to_string(new Date()));
     contents = h.replaceStr(contents, '%LOG%', String(obj));
-    console.log(contents);
+    if (showDetailOnBrowserConsole) {
+        console.log(contents);
+    } else {
+        console.log(obj);
+    }
     if (h.logAppendee != null && typeof (h.logAppendee) != 'undefined') {
-        $(h.logAppendee).append(contents);
+        if (showDetailOnComp) $(h.logAppendee).append(contents);
+        else $(h.logAppendee).append(String(obj));
         $(h.logAppendee).append("\n");
     }
 };
 
+function hjow_log(obj) {
+    hjow_rawLog(obj, true, false);
+};
+
 h.log = hjow_log;
+
+function hjow_error(e) {
+    hjow_rawLog(obj, false, false);
+};
+
+h.showError = hjow_error;
 
 function hjow_prepareDialogLog() {
     if ($('.div_hjow_dialog_console .tf_hjow_console').length <= 0) {
@@ -186,7 +201,7 @@ function hjow_getOnLocalStorage(key) {
     try {
         return localStorage.getItem(key);
     } catch (e) {
-        hjow_log(e);
+        hjow_error(e);
         return null;
     }
 }
@@ -457,7 +472,7 @@ function hjow_toStaticHTML(htmlStr) {
         if (typeof (toStaticHTML) != 'undefined' && toStaticHTML != null) return toStaticHTML(htmlStr);
         return htmlStr;
     } catch (e) {
-        hjow_log(e);
+        hjow_error(e);
         return htmlStr;
     }
 };
@@ -466,6 +481,10 @@ h.toStaticHTML = hjow_toStaticHTML;
 
 function hjow_workOnDocumentReady(actionFunc) {
     $(document).ready(function () {
+        if (!hjow_isSupportedBrowser()) {
+            hjow_alert('This browser or platform is not supported.');
+            return;
+        }
         h.property.screenWidth = window.screenWidth;
         h.property.screenHeight = window.screenHeight;
         try {
@@ -498,7 +517,7 @@ function hjow_findEngine(uniqueId) {
             var engineOne = h.engine[idx]; // getUniqueId
             if (uniqueId == engineOne.getUniqueId()) return engineOne;
         } catch (e) {
-
+            hjow_error(e);
         }
     }
     return null;
@@ -518,3 +537,17 @@ function hjow_replaceBr(str) {
 };
 
 h.replaceBr = hjow_replaceBr;
+
+function hjow_isSupportedBrowser() {
+    if ("".trim == null || typeof ("".trim) == 'undefined') return false;
+    if ($ == null || typeof($) == 'undefined') return false;
+    return true;
+};
+
+h.isSupportedBrowser = hjow_isSupportedBrowser;
+
+function hjow_ajax(obj) {
+    $.ajax(obj);
+};
+
+h.ajax = hjow_ajax;

@@ -436,6 +436,9 @@ class XCardPlayer extends Uniqueable {
         super();
         this.name = name;
     };
+    public getClassName(): string {
+        return "XCardPlayer";
+    };
     public getName(): string {
         return this.name;
     }
@@ -694,6 +697,9 @@ class XCardPlayerCreator extends Uniqueable {
     public getTypeName() {
         return null;
     };
+    public getSupportPlayerClassName() {
+        return null;
+    };
     public create(name: string): XCardPlayer {
         return null;
     };
@@ -713,6 +719,9 @@ class XCardPlayerCreator extends Uniqueable {
 class XCardUserPlayer extends XCardPlayer {
     public constructor(name: string) {
         super(name);
+    };
+    public getClassName(): string {
+        return "XCardUserPlayer";
     };
     public getPlayerTypeName(): string {
         return "Player";
@@ -735,14 +744,17 @@ class XCardUserPlayer extends XCardPlayer {
 class XCardUserPlayerCreator extends XCardPlayerCreator {
     public getTypeName() {
         return "Player";
-    }
+    };
     public create(name: string): XCardPlayer {
         return new XCardUserPlayer(name);
-    }
+    };
+    public getSupportPlayerClassName() {
+        return "XCardUserPlayer";
+    };
     public restoreFromPlainObject(obj: any, engine: XCardGameEngine): XCardPlayer {
         if (engine == null) return null;
         if (!(engine instanceof XCardGameEngine)) return null;
-        if (obj.type != 'XCardUserPlayer') return null;
+        if (obj.type != this.getSupportPlayerClassName()) return null;
         var result: XCardUserPlayer = new XCardUserPlayer(obj.name);
         result.setUniqueIdFromCreator(this, obj.uniqueId);
         var invArr: XCard[] = [];
@@ -764,7 +776,7 @@ class XCardUserPlayerCreator extends XCardPlayerCreator {
         }
         result.setApplied(appArr, engine);
         return result;
-    }
+    };
 };
 
 function hjow_orderPlayerList(players: XCardPlayer[], gameMode: XCardGameMode): XCardPlayer[] {
@@ -794,7 +806,7 @@ function hjow_orderPlayerList(players: XCardPlayer[], gameMode: XCardGameMode): 
 
         preventInfLoop++;
         if (preventInfLoop >= 1000 * Math.max(temps.length, 1)) {
-            hjow_log("Infinite Loop Detected");
+            hjow_error("Infinite Loop Detected");
             break;
         }
     }
@@ -807,7 +819,10 @@ class XCardAIPlayer extends XCardPlayer {
     protected customAIScript: string = null;
     public constructor(name: string) {
         super(name);
-    }
+    };
+    public getClassName(): string {
+        return "XCardAIPlayer";
+    };
     public getPlayerTypeName(): string {
         return "AI";
     };
@@ -1040,7 +1055,7 @@ class XCardAIPlayer extends XCardPlayer {
 
                 preventInfLoop++;
                 if (preventInfLoop >= 1000 * Math.max(availableActions.length, 1)) {
-                    hjow_log("Infinite Loop Detected");
+                    hjow_error("Infinite Loop Detected");
                     break;
                 }
             }
@@ -1157,10 +1172,13 @@ class XCardAIPlayerCreator extends XCardPlayerCreator {
     public create(name: string): XCardPlayer {
         return new XCardAIPlayer(name);
     };
+    public getSupportPlayerClassName() {
+        return "XCardUserPlayer";
+    };
     public restoreFromPlainObject(obj: any, engine: XCardGameEngine): XCardPlayer {
         if (engine == null) return null;
         if (!(engine instanceof XCardGameEngine)) return null;
-        if (obj.type != 'XCardAIPlayer') return null;
+        if (obj.type != this.getSupportPlayerClassName()) return null;
         var result: XCardAIPlayer = new XCardAIPlayer(obj.name);
         result.setUniqueIdFromCreator(this, obj.uniqueId);
         var invArr: XCard[] = [];
@@ -1192,6 +1210,9 @@ class XCardTutorialPlayer extends XCardAIPlayer {
     public getPlayerTypeName(): string {
         return "Tutorial";
     };
+    public getClassName() {
+        return "XCardTutorialPlayer";
+    };
     public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[]) {
         
     };
@@ -1219,11 +1240,14 @@ class XCardTutorialPlayerCreator extends XCardAIPlayerCreator {
     public create(name: string): XCardPlayer {
         return new XCardTutorialPlayer(name);
     };
+    public getSupportPlayerClassName() {
+        return "XCardTutorialPlayer";
+    };
     public restoreFromPlainObject(obj: any, engine: XCardGameEngine): XCardPlayer {
         if (engine == null) return null;
         if (!(engine instanceof XCardGameEngine)) return null;
-        if (obj.type != 'XCardTutorialPlayer') return null;
-        var result: XCardAIPlayer = new XCardAIPlayer(obj.name);
+        if (obj.type != this.getSupportPlayerClassName()) return null;
+        var result: XCardTutorialPlayer = new XCardTutorialPlayer(obj.name);
         result.setUniqueIdFromCreator(this, obj.uniqueId);
         var invArr: XCard[] = [];
         for (var idx = 0; idx < obj.inventory; idx++) {
@@ -1540,7 +1564,8 @@ class XCardGameEngine extends ModuleObject {
     public constructor(plcArea: string = '.hjow_xcard_style_place', debugMode: boolean = false) {
         super("X Card", "X Card Game Core Engine");
         if (typeof (plcArea) != 'string') {
-            hjow_log('The parameter should be a string which is jQuery-selector form.');
+            hjow_error('The parameter should be a string which is jQuery-selector form.');
+            return;
         }
         this.placeArea = String(plcArea);
         hjow_prepareJQuery();
@@ -1678,7 +1703,7 @@ class XCardGameEngine extends ModuleObject {
                 }
             }
         } catch (e) {
-            hjow_log(e);
+            hjow_error(e);
         }
     };
     private clearAllPlayers() {
@@ -1831,6 +1856,13 @@ class XCardGameEngine extends ModuleObject {
     public isHided(): boolean {
         return this.needHideScreen;
     };
+    public setDeck(cards: XCard[], mode: XCardGameMode) {
+        if (mode == null) return;
+        if (!(mode instanceof XCardGameMode)) return;
+        if (this.gameModeList[this.gameModeIndex].getUniqueId() != mode.getUniqueId()) return;
+
+        this.deck = cards;
+    };
     private addTimer(name: string, desc: string, func: Function, timeGap: number = 1000) {
         var newTimer: IntervalTimer = new IntervalTimer(name, desc, func, timeGap);
         this.timers.push(newTimer);
@@ -1856,7 +1888,7 @@ class XCardGameEngine extends ModuleObject {
             curIdx++;
             preventInfLoop++;
             if (preventInfLoop >= 1000 * Math.max(this.timers.length, 1)) {
-                hjow_log("Infinite Loop Detected");
+                hjow_error("Infinite Loop Detected");
                 break;
             }
         }
@@ -1899,7 +1931,7 @@ class XCardGameEngine extends ModuleObject {
         try {
             this.properties.fromJSON(localStoreStr);
         } catch (e) {
-            hjow_log(e);
+            hjow_error(e);
         }
     };
     private findPlayer(uniqueId: string): XCardPlayer {
@@ -2831,7 +2863,7 @@ class XCardGameEngine extends ModuleObject {
                 action.date = new Date();
                 this.replay.actions.push(action);
             } catch (e) {
-                hjow_log(e);
+                hjow_error(e);
                 this.replay = null;
             }
         }
@@ -3035,7 +3067,7 @@ class XCardGameEngine extends ModuleObject {
                     action.date = new Date();
                     selfObj.replay.actions.push(action);
                 } catch (e) {
-                    hjow_log(e);
+                    hjow_error(e);
                     selfObj.replay = null;
                 }
             }
