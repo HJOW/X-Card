@@ -1620,7 +1620,7 @@ class XCardGameEngine extends ModuleObject {
         this.gameModeList.push(new XCardGameDefaultMode());
         this.gameModeList.push(new XCardGameSpeedMode());
         this.gameModeList.push(new XCardGameMultiplylessMode());
-        this.gameModeList.push(new XCardGameTutorial());
+        // this.gameModeList.push(new XCardGameTutorial());
     };
     protected applyProperties() {
         this.applyPropertiesBefore();
