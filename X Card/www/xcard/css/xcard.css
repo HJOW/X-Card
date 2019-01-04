@@ -280,3 +280,13 @@ limitations under the License.
     min-height: 100px;
     height: 120px;
 }
+
+.hjow_xcard_style_place .finish_result {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
+.hjow_xcard_style_place .finish_result.lb_finish_result {
+    font-weight: normal;
+}

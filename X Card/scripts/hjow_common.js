@@ -488,16 +488,17 @@ function hjow_workOnDocumentReady(actionFunc) {
         }
         h.property.screenWidth = window.screenWidth;
         h.property.screenHeight = window.screenHeight;
+        var actionFuncParam = null;
         try {
             jq = $;
             if (hjow_processSecurityProcess != null && typeof (hjow_processSecurityProcess) != 'undefined') {
-                hjow_processSecurityProcess();
+                actionFuncParam = hjow_processSecurityProcess;
             }
         } catch (e) {
             try { console.log(e); } catch (e1) { }
         }
         if (actionFunc == null || typeof (actionFunc) == 'undefined') return;
-        actionFunc();
+        actionFunc(actionFuncParam);
     });
 };
 

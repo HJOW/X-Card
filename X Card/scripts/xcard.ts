@@ -214,6 +214,7 @@ class XCardReplay extends UtilityMethods {
     public players: XCardPlayer[] = []; // should be first states
     public deck: XCard[] = []; // should be first states
     public gameMode: string = null;
+    public reason: string = null;
     public toPlainObjectDetail(engine: XCardGameEngine): any {
         if (engine == null) return null;
         if (!(engine instanceof XCardGameEngine)) return null;
@@ -238,7 +239,8 @@ class XCardReplay extends UtilityMethods {
             actions: actionPlains,
             players: playersPlains,
             deck: deckPlains,
-            gameMode: this.gameMode
+            gameMode: this.gameMode,
+            reason: this.reason
         };
     };
 };
@@ -993,7 +995,7 @@ class XCardAIPlayer extends XCardPlayer {
                                 // 점수 차가 너무 벌어져 있다면 이것으로도 부족하므로 추가 작업
                                 if (avgPoint.compare(beforePoint) > 0) {
                                     var targetPlayerGapAvg: TBigInt = avgPoint.subtract(beforePoint); // 평균 점수에서 타겟 플레이어 점수를 뺌
-                                    if (targetPlayerGapAvg.abs().compare(variancePoint.abs().divide(new TBigInt(2))) > 0) {
+                                    if (targetPlayerGapAvg.abs().compare(variancePoint.abs().divide(new TBigInt(4))) > 0) {
                                         actionPoint = actionPoint.subtract(new TBigInt(-999999999));
                                     }
                                 }
@@ -1570,6 +1572,7 @@ class XCardGameEngine extends ModuleObject {
     private needHideScreen: boolean = false;
     private hideScreenTime: number = 0;
     private showResult: boolean = false;
+    private resultReason: string = null;
     private turnChanging: boolean = false;
     private actPlayerTurnRequest: boolean = false;
     private actPlayerTurnStopRequest: boolean = false;
@@ -1577,7 +1580,7 @@ class XCardGameEngine extends ModuleObject {
     private showSettings: boolean = false;
     private debugMode: boolean = false;
 
-    public constructor(plcArea: string = '.hjow_xcard_style_place', debugMode: boolean = false) {
+    public constructor(plcArea: string = '.hjow_xcard_style_place', securityFunction: Function = null, debugMode: boolean = false) {
         super("X Card", "X Card Game Core Engine");
         if (typeof (plcArea) != 'string') {
             hjow_error('The parameter should be a string which is jQuery-selector form.');
@@ -1591,9 +1594,13 @@ class XCardGameEngine extends ModuleObject {
             hjow_putEngine(this);
             jq('body').css('overflow-y', 'scroll');
         }
+        if (securityFunction != null) securityFunction(this);
     };
     public getClassName(): string {
         return "XCardGameEngine";
+    };
+    public getVersion() {
+        return this.version;
     };
     public init() {
         this.initEngine();
@@ -1977,7 +1984,9 @@ class XCardGameEngine extends ModuleObject {
 
         this.turnNumber = this.turnNumber + 1; // 턴 번호 증가
 
-        if (this.checkFinishGameCondition()) {
+        var finishGameReasonIfExists: string = this.checkFinishGameCondition();
+        if (finishGameReasonIfExists != null) {
+            this.resultReason = finishGameReasonIfExists;
             this.finishGame(true);
             return;
         }
@@ -2006,13 +2015,13 @@ class XCardGameEngine extends ModuleObject {
         this.showSettings = false;
         this.refreshPage(false);
     };
-    private checkFinishGameCondition(): boolean {
-        if (this.deck.length <= 0) return true;
+    private checkFinishGameCondition(): string {
+        if (this.deck.length <= 0) return hjow_trans("The deck is empty.");
         for (var idx = 0; idx < this.players.length; idx++) {
             var player: XCardPlayer = this.players[idx];
-            if (player.getInventoryCardCount() <= 0) return true;
+            if (player.getInventoryCardCount() <= 0) return hjow_replaceStr(hjow_trans("The player [[PLAYER]] does not have any card."), "[[PLAYER]]", player.getName());
         }
-        return false;
+        return null;
     };
     private finishGame(normalReason: boolean = false) {
         //this.stopTimer("LimitTimer"); // timer stop 시 다시 게임시작 후 MS Edge 브라우저에서 동작 안함
@@ -2021,11 +2030,7 @@ class XCardGameEngine extends ModuleObject {
         this.gameStarted = false;
         this.needHideScreen = false;
         this.showSettings = false;
-        if (normalReason) {
-            this.showResult = true;
-        } else {
-            this.showResult = false;
-        }
+        this.showResult = true;
         var gameMode: XCardGameMode = this.getSelectedGameMode();
         gameMode.onFinishGame(this, this.players, this.deck);
 
@@ -2034,6 +2039,7 @@ class XCardGameEngine extends ModuleObject {
         
         this.refreshPage(false);
         this.replay = null; // 화면 리프레시 이후에 리플레이 초기화 (결과 화면에서 리플레이 JSON 출력 후에 초기화하기 위함)
+        this.resultReason = null;
     };
     public isDebugMode(): boolean {
         return this.debugMode;
@@ -2384,6 +2390,9 @@ class XCardGameEngine extends ModuleObject {
     private refreshResult() {
         var gameMode: XCardGameMode = this.getSelectedGameMode();
         jq(this.placeArea).find('.replay_result').hide();
+        var finResultLb = jq(this.placeArea).find('.lb_finish_result');
+        finResultLb.text('');
+        if (this.resultReason != null) finResultLb.text(this.resultReason);
         for (var idx = 0; idx < this.players.length; idx++) {
             var playerOne: XCardPlayer = this.players[idx];
 
@@ -2395,6 +2404,8 @@ class XCardGameEngine extends ModuleObject {
         }
         this.initTheme(1, false);
         if (this.replay != null) {
+            var rsn = this.resultReason;
+            this.replay.reason = (rsn == null ? "" : rsn);
             this.resultReplay();
         } else {
             jq(this.placeArea).find('.replay_json').val('');
@@ -2549,6 +2560,7 @@ class XCardGameEngine extends ModuleObject {
         results += "<div class='element e033 setting_element setting_buttons_bottom'>" + "\n";
         results += "   <p class='element e034'>" + "\n";
         results += "       <button type='button' class='element e035 btn_apply_setting'>" + hjow_serializeXMLString(hjow_trans("Apply")) + "</button>" + "\n";
+        results += "       <span class='element label e148 lb_need_restart_to_apply'>" + hjow_serializeXMLString(hjow_trans("Some features will be applied after restart.")) + "</span>" + "\n";
         results += "   </p>" + "\n";
         results += "</div>" + "\n";
         return results;
@@ -2603,7 +2615,8 @@ class XCardGameEngine extends ModuleObject {
         results += "<table class='element e057 full layout'>" + "\n";
         results += "   <tr class='element e058'>" + "\n";
         results += "      <td class='element e059'>" + "\n";
-        results += "         <h3 class='element e060'>" + hjow_serializeXMLString(hjow_trans("Result")) + "</h3>" + "\n";
+        results += "         <h3 class='element e060'>" + hjow_serializeXMLString(hjow_trans("Result")) + "</h3>" + "<br/>" + "\n";
+        results += "         <span class='element label e149 finish_result'>" + hjow_trans("Reason") + " : </span><span class='element label e150 finish_result lb_finish_result'></span>" + "\n";
         results += "      </td>" + "\n";
         results += "   </tr>" + "\n";
         results += "   <tr class='element e061'>" + "\n";
@@ -3120,6 +3133,7 @@ class XCardGameEngine extends ModuleObject {
             selfObj.payHere(playerUniqId, selectedCardVal[0]);
         };
         selfAny.events.game.btn_game_stop = function () {
+            selfObj.resultReason = hjow_trans('The user stop the game.');
             selfObj.finishGame(false);
         };
         selfAny.events.hide = {};
@@ -3248,6 +3262,7 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Stop Game", "게임 중단");
         newLangSet.stringTable.set("Press this button to continue...", "계속 진행하려면 이 버튼을 클릭해 주세요.");
         newLangSet.stringTable.set("Result", "결과");
+        newLangSet.stringTable.set("Reason", "이유");
         newLangSet.stringTable.set("Name", "이름");
         newLangSet.stringTable.set("Type", "타입");
         newLangSet.stringTable.set("Affects", "점수 계산식");
@@ -3305,6 +3320,10 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Please select correct player type.", "올바른 플레이어 타입을 선택해 주세요.");
         newLangSet.stringTable.set("Try this first to learn about this game.", "게임을 배우기 위해 이 모드를 처음 플레이해 보세요.");
         newLangSet.stringTable.set("How to play", "게임 방법");
+        newLangSet.stringTable.set("Some features will be applied after restart.", "일부 기능은 재시작 후 적용됩니다.");
+        newLangSet.stringTable.set("The user stop the game.", "사용자가 게임을 중단시켰습니다.");
+        newLangSet.stringTable.set("The player [[PLAYER]] does not have any card.", "플레이어 '[[PLAYER]]' 이/가 카드를 보유한 카드가 없습니다.");
+        newLangSet.stringTable.set("The deck is empty.", "덱에 카드가 없습니다.");
         newLangSet.stringTable.set("There must be at least two players, and there is no maximum limit, but it is recommended that four players play. Support play with simple AI computer.", "플레이어는 최소 2명 이상이어야 하고, 최대 제한은 없지만 4명이서 플레이하는 것을 권장합니다.\n인공지능 컴퓨터와의 플레이를 지원합니다.");
         newLangSet.stringTable.set("This game is a turn-based card game.", "이 게임은 턴제 카드 게임입니다.");
         newLangSet.stringTable.set("The cards used in this game are represented by numbers between -1 and 10, and three symbols (＋－×); As such, there are 33 different types of cards in a set of cards.", "이 게임에서 사용하는 카드는, -1 ~ 10 사이의 숫자와,\n＋－× 3가지 기호 중 각 하나씩이 그려져 있습니다.\n이와 같이, 카드 1세트에는 33가지 다른 종류의 카드가 있습니다.");
