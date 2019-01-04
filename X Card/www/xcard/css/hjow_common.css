@@ -20,10 +20,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 body {
     overflow-x: hidden;
     overflow-y: hidden;
+    font-family: 'Nanum Gothic', NanumGothic, NanumGothicCoding;
 }
+
+pre {
+    font-family: 'Nanum Gothic', NanumGothic, NanumGothicCoding;
+}
+
 div.page, table.full, td.full, button.full {
     width: 100%;
     height: 100%;
