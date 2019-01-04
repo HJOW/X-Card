@@ -313,7 +313,8 @@ function hjow_setProgressValue(progressBarObj, valueAsFloat, text) {
     var calcWidth = Math.round(valueAsFloat * maxWidth);
 
     if (typeof (text) == 'undefined') text = "";
-    progIn.text(text);
+    if (progObj.find('.progress_text').length >= 1) progObj.find('.progress_text').text(text);
+    else progIn.text(text);
     
     progIn.width(calcWidth);
 }

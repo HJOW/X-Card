@@ -52,10 +52,20 @@ div.page, table.full, td.full, button.full {
 
 .progress_in {
     background-color: skyblue;
+    color: black;
     width: 0px;
     height: 18px;
     display: block;
     text-align: center;
+}
+
+.progress_text {
+    background-color: transparent;
+    float: left;
+    z-index: 1;
+    margin-top: -18px;
+    text-align: center;
+    width: 100%;
 }
 
 .accents {

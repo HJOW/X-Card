@@ -1,6 +1,6 @@
 ﻿
 /*
-This JS library is made by HJOW.
+This CSS file is made by HJOW.
 E-mail : hujinone22@naver.com
 
 This css file need following libraries : jQuery UI, hjow_common.
@@ -44,6 +44,9 @@ limitations under the License.
 
 .hjow_xcard_style_place td.td_player td{
     border: 1px solid lightgray;
+}
+.hjow_xcard_style_place button {
+    margin-right: 2px;
 }
 
 .hjow_xcard_style_place button.btn_game_start {

@@ -441,7 +441,7 @@ class XCardPlayer extends Uniqueable {
     };
     public getName(): string {
         return this.name;
-    }
+    };
     public setInventory(cardList: XCard[], engine: XCardGameEngine) {
         if (engine == null) return;
         if (!(engine instanceof XCardGameEngine)) return;
@@ -652,7 +652,7 @@ class XCardPlayer extends Uniqueable {
     public needToHideInventoryForSelf(): boolean { // AI가 아닌 경우, 자기 자신 차례일 때는 인벤토리가 보여야 함
         return false;
     };
-    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[]) {
+    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[], turnNumber: number) {
         if (engine == null) return;
         if (!(engine instanceof XCardGameEngine)) return;
 
@@ -660,7 +660,11 @@ class XCardPlayer extends Uniqueable {
     public setName(name: string, engine: XCardGameEngine) {
         if (engine == null) return;
         if (!(engine instanceof XCardGameEngine)) return;
+        if (! this.isNameEditable()) return;
         this.name = name;
+    };
+    public isNameEditable(): boolean {
+        return true;
     };
     protected setUniqueId(uniqueId: string) {
         this.uniqueId = uniqueId;
@@ -731,7 +735,7 @@ class XCardUserPlayer extends XCardPlayer {
         if (!(engine instanceof XCardGameEngine)) return null;
 
         var result = super.toPlainObject(engine);
-        result.type = 'XCardUserPlayer';
+        result.type = this.getClassName();
         return result;
     };
     public setUniqueIdFromCreator(creator: XCardPlayerCreator, uniqueId: string) {
@@ -842,7 +846,7 @@ class XCardAIPlayer extends XCardPlayer {
         if (!(engine instanceof XCardGameEngine)) return;
         this.customAIScript = scripts;
     };
-    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[]) {
+    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[], turnNumber: number) {
         if (engine == null) return;
         if (!(engine instanceof XCardGameEngine)) return;
         if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this))) return;
@@ -1153,7 +1157,7 @@ class XCardAIPlayer extends XCardPlayer {
         if (!(engine instanceof XCardGameEngine)) return null;
 
         var result = super.toPlainObject(engine);
-        result.type = 'XCardAIPlayer';
+        result.type = this.getClassName();
         result.difficulty = this.difficulty;
         result.customAIScript = this.customAIScript;
         return result;
@@ -1208,12 +1212,12 @@ class XCardTutorialPlayer extends XCardAIPlayer {
         super(name);
     }
     public getPlayerTypeName(): string {
-        return "Tutorial";
+        return "Tutorial Assistant";
     };
     public getClassName() {
         return "XCardTutorialPlayer";
     };
-    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[]) {
+    public actOnTurn(engine: XCardGameEngine, mode: XCardGameMode, deck: XCard[], players: XCardPlayer[], turnNumber: number) {
         
     };
     public toPlainObject(engine: XCardGameEngine): any {
@@ -1221,21 +1225,33 @@ class XCardTutorialPlayer extends XCardAIPlayer {
         if (!(engine instanceof XCardGameEngine)) return null;
 
         var result = super.toPlainObject(engine);
-        result.type = 'XCardTutorialPlayer';
-        result.difficulty = this.difficulty;
-        result.customAIScript = this.customAIScript;
+        result.type = this.getClassName();
+        result.difficulty = 0;
+        result.customAIScript = '';
         return result;
     };
     public setUniqueIdFromCreator(creator: XCardPlayerCreator, uniqueId: string) {
         if (creator == null) return;
-        if (!(creator instanceof XCardAIPlayerCreator)) return;
+        if (!(creator instanceof XCardTutorialPlayerCreator)) return;
         this.setUniqueId(uniqueId);
+    };
+    public customMainHTML(): string {
+        return null;
+    };
+    public refreshMain(engine: XCardGameEngine) {
+        
+    };
+    public applyInputs(engine: XCardGameEngine, gameStarted: boolean, needHideScreen: boolean, showResult: boolean) {
+        this.difficulty = 0;
+    };
+    public isNameEditable() {
+        return false;
     };
 };
 
 class XCardTutorialPlayerCreator extends XCardAIPlayerCreator {
     public getTypeName() {
-        return "Tutorial";
+        return "Tutorial Assistant";
     };
     public create(name: string): XCardPlayer {
         return new XCardTutorialPlayer(name);
@@ -1454,15 +1470,15 @@ class XCardGameTutorial extends XCardGameDefaultMode {
         newPlayer.setUniqueIdFromMode(this, "p0");
         results.push(newPlayer);
 
-        newPlayer = new XCardAIPlayer(hjow_trans("AI") + " 1");
+        newPlayer = new XCardTutorialPlayer(hjow_trans("AI") + " 1");
         newPlayer.setUniqueIdFromMode(this, "p1");
         results.push(newPlayer);
 
-        newPlayer = new XCardAIPlayer(hjow_trans("AI") + " 2");
+        newPlayer = new XCardTutorialPlayer(hjow_trans("AI") + " 2");
         newPlayer.setUniqueIdFromMode(this, "p2");
         results.push(newPlayer);
 
-        newPlayer = new XCardAIPlayer(hjow_trans("AI") + " 3");
+        newPlayer = new XCardTutorialPlayer(hjow_trans("AI") + " 3");
         newPlayer.setUniqueIdFromMode(this, "p3");
         results.push(newPlayer);
 
@@ -1604,7 +1620,7 @@ class XCardGameEngine extends ModuleObject {
         this.gameModeList.push(new XCardGameDefaultMode());
         this.gameModeList.push(new XCardGameSpeedMode());
         this.gameModeList.push(new XCardGameMultiplylessMode());
-        // this.gameModeList.push(new XCardGameTutorial());
+        this.gameModeList.push(new XCardGameTutorial());
     };
     protected applyProperties() {
         this.applyPropertiesBefore();
@@ -1794,7 +1810,7 @@ class XCardGameEngine extends ModuleObject {
                 if (selfObj.needHideScreen) return;
 
                 selfObj.actPlayerTurnRequest = false;
-                selfObj.players[selfObj.turnPlayerIndex].actOnTurn(selfObj, selfObj.gameModeList[selfObj.gameModeIndex], selfObj.deck, selfObj.players);
+                selfObj.players[selfObj.turnPlayerIndex].actOnTurn(selfObj, selfObj.gameModeList[selfObj.gameModeIndex], selfObj.deck, selfObj.players, selfObj.turnNumber);
             }, 500);
         }
 
@@ -1814,7 +1830,7 @@ class XCardGameEngine extends ModuleObject {
         }
 
         hjow_log(hjow_trans("Game is started."));
-        if (this.isDebugMode) hjow_log(hjow_trans("Debug mode was activated."));
+        if (this.isDebugMode()) hjow_log(hjow_trans("Debug mode was activated."));
         hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.getPlayerNowTurn().getName()));
         
         this.refreshPage();
@@ -2014,7 +2030,7 @@ class XCardGameEngine extends ModuleObject {
         gameMode.onFinishGame(this, this.players, this.deck);
 
         hjow_log(hjow_trans("Game is finished."));
-        if (this.isDebugMode) hjow_log(hjow_trans("Debug mode was activated."));
+        if (this.isDebugMode()) hjow_log(hjow_trans("Debug mode was activated."));
         
         this.refreshPage(false);
         this.replay = null; // 화면 리프레시 이후에 리플레이 초기화 (결과 화면에서 리플레이 JSON 출력 후에 초기화하기 위함)
@@ -2064,9 +2080,9 @@ class XCardGameEngine extends ModuleObject {
         }
         this.initTheme(2, false);
         this.refreshEvents();
-        if (this.debugMode) {
+        if (this.showSettings && this.debugMode) {
             this.refreshSettingPage();
-            jq(this.placeArea).find('.btn_go_setting').show();
+            jq(this.placeArea).find('.page_set').show();
         }
     };
     private refreshMain() {
@@ -2558,7 +2574,7 @@ class XCardGameEngine extends ModuleObject {
         results += "   </tr>" + "\n";
         results += "   <tr class='element e046'>" + "\n";
         results += "       <td class='element e047 td_game_status'>" + "\n";
-        results += "           <span class='element e048 progress prog_game_status_bar'><span class='element e049 progress_in'>" + "</span></span>\n";
+        results += "           <span class='element e048 progress prog_game_status_bar'><span class='element e049 progress_in'>" + "</span><span class='element progress_text e147'></span></span>\n";
         results += "       </td>" + "\n";
         results += "   </tr>" + "\n";
         results += "</table>" + "\n";
@@ -2669,7 +2685,9 @@ class XCardGameEngine extends ModuleObject {
         results += "              <span class='label element e094'>" + hjow_serializeXMLString(hjow_trans("Name")) + "</span>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td class='element e095 player_info_basic'>" + "\n";
-        results += "             <input type='text' class='element e096 inp_pname' name='pname_" + hjow_serializeString(player.getUniqueId()) + "' value='" + hjow_serializeString(player.getName()) + "'/>" + "\n";
+        var playerNameFieldOpt: string = "";
+        if (!player.isNameEditable()) playerNameFieldOpt = " disabled";
+        results += "             <input type='text' class='element e096 inp_pname" + playerNameFieldOpt + "' name='pname_" + hjow_serializeString(player.getUniqueId()) + "' value='" + hjow_serializeString(player.getName()) + "'" + playerNameFieldOpt + "/>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td rowspan='2' class='element e097'>" + "\n";
         var customHtml = player.customMainHTML();
@@ -2747,7 +2765,7 @@ class XCardGameEngine extends ModuleObject {
         if (jq('.hjow_xcard_how_to_play_dialog').length >= 1) { // 플레이 영역 밖에 있는 영역임 !
             results += "   <button type='button' class='element e146 btn_show_how_to'> " + hjow_serializeXMLString(hjow_trans("How to play")) + "</button>";
         }
-        if ((!(this.showResult || this.needHideScreen || this.showSettings)) || this.isDebugMode) {
+        if ((!this.showSettings) && ((!(this.gameStarted || this.showResult || this.needHideScreen)) || this.isDebugMode())) {
             results += "<button type='button' class='element e129 btn_go_setting'>" + hjow_serializeXMLString(hjow_trans("Settings")) + "</button> ";
         }
         results += "   <button type='button' class='element e131 btn_show_log'> " + hjow_serializeXMLString(hjow_trans("Show Log")) + "</button>";
@@ -3269,6 +3287,7 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Message", "메시지");
         newLangSet.stringTable.set("Tip", "팁");
         newLangSet.stringTable.set("Tutorial", "게임 배우기");
+        newLangSet.stringTable.set("Tutorial Assistant", "튜토리얼 도우미");
         newLangSet.stringTable.set("Theme Script", "테마 스크립트");
         newLangSet.stringTable.set("You can paste the styling scripts here.", "이 곳에 테마 변경용 스크립트(JSON)를 입력할 수 있습니다.");
         newLangSet.stringTable.set("On this platform, local storage saving is not working. Changes will be applied only this time.", "이 플랫폼에서는 로컬 저장소 기능을 사용할 수 없습니다. 설정은 적용되지만 다음 번 실행 시 다시 초기화됩니다.");
@@ -3284,7 +3303,7 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Debug mode was activated.", "디버그 모드 활성화됨");
         newLangSet.stringTable.set("Please add player to play.", "게임 시작 전 플레이어를 추가해 주세요.");
         newLangSet.stringTable.set("Please select correct player type.", "올바른 플레이어 타입을 선택해 주세요.");
-        newLangSet.stringTable.set("Try this first to learn about this game.", "게임을 배우기 위해 이 모드를 처음 플레이하세요.");
+        newLangSet.stringTable.set("Try this first to learn about this game.", "게임을 배우기 위해 이 모드를 처음 플레이해 보세요.");
         newLangSet.stringTable.set("How to play", "게임 방법");
         newLangSet.stringTable.set("There must be at least two players, and there is no maximum limit, but it is recommended that four players play. Support play with simple AI computer.", "플레이어는 최소 2명 이상이어야 하고, 최대 제한은 없지만 4명이서 플레이하는 것을 권장합니다.\n인공지능 컴퓨터와의 플레이를 지원합니다.");
         newLangSet.stringTable.set("This game is a turn-based card game.", "이 게임은 턴제 카드 게임입니다.");
