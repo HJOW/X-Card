@@ -541,12 +541,28 @@ function hjow_replaceBr(str) {
 h.replaceBr = hjow_replaceBr;
 
 function hjow_isSupportedBrowser() {
+    if (!hjow_supportES5()) return false;
     if ("".trim == null || typeof ("".trim) == 'undefined') return false;
-    if ($ == null || typeof($) == 'undefined') return false;
+    if ($ == null || typeof ($) == 'undefined') return false;
     return true;
 };
 
 h.isSupportedBrowser = hjow_isSupportedBrowser;
+
+function hjow_supportES6() {
+    try {
+        var testObj = 1;
+        (testObj = 0) => testObj;
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
+function hjow_supportES5() {
+    if (Object.create == null || typeof (Object.create) == 'undefined') return false;
+    return true;
+};
 
 function hjow_ajax(obj) {
     $.ajax(obj);

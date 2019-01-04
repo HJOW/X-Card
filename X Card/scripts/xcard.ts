@@ -914,8 +914,10 @@ class XCardAIPlayer extends XCardPlayer {
             var offensives: number = 1; // 공격 행동 비율점수
             var defendees: number = 1;  // 방어 행동 비율점수
 
-            if (this.difficulty == 1) defendees = 2;
-            if (this.difficulty == 0) defendees = 3; // 난이도에 따라 인공지능을 좀 더 방어적으로 행동하도록 함
+            // 난이도에 따라 인공지능을 좀 더 방어적으로 행동하도록 함
+            if (this.difficulty == 2) defendees = 2;
+            if (this.difficulty == 1) defendees = 4;
+            if (this.difficulty == 0) defendees = 8;
 
             // 덱에서 카드를 받는 동작은 항상 사용가능 (단, 지금 다른 플레이어에 비해 불리한 상황이면서 덱에 남은 카드 수가 적으면, 점수를 낮게 책정함) --> 동작 수는 항상 1 이상
             oneAct = new XCardAIProcessAction();
@@ -1071,22 +1073,29 @@ class XCardAIPlayer extends XCardPlayer {
             // 동작들 중 실제 수행할 동작 선택
             var selectedAct: XCardAIProcessAction = null;
             var randomNo: number = Math.round(Math.random() * 100.0);
-            if (this.difficulty >= 3) { // 극한 (출력은 안함)
+            if (this.difficulty >= 4) { // 미친 난이도
                 selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
-            } else if (this.difficulty == 2) { // 어려움
+            } else if (this.difficulty == 3) { // 극한
                 if (randomNo >= 10) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
                 else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
-            } else if (this.difficulty == 1) { // 보통
+            } else if (this.difficulty == 2) { // 어려움
                 if (randomNo >= 50) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (randomNo >= 10 && orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
                 else if (orderedActions.length >= 3) selectedAct = orderedActions[2]; // 차차선
                 else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
-            } else { // 쉬움
+            } else if (this.difficulty == 1) { // 보통
                 if (randomNo >= 65) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (randomNo >= 30 && orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
                 else if (randomNo >= 10 && orderedActions.length >= 3) selectedAct = orderedActions[2]; // 차차선
                 else if (randomNo >= 5  && orderedActions.length >= 4) selectedAct = orderedActions[3]; // 차차차선
+                else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+            } else { // 쉬움
+                if (randomNo >= 70) selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
+                else if (randomNo >= 60 && orderedActions.length >= 2) selectedAct = orderedActions[1]; // 차선
+                else if (randomNo >= 50 && orderedActions.length >= 3) selectedAct = orderedActions[2]; // 차차선
+                else if (randomNo >= 20 && orderedActions.length >= 4) selectedAct = orderedActions[3]; // 차차차선
+                else if (randomNo >= 5  && orderedActions.length >= 5) selectedAct = orderedActions[4]; // 차차차차선
                 else selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
             }
 
@@ -1120,11 +1129,13 @@ class XCardAIPlayer extends XCardPlayer {
         results += "<div class='div_player_ai_custom_element'>";
         results += "<span class='label'>" + hjow_trans("Difficulty") + "</span> ";
         results += "<select class='sel_ai_difficulty'>";
-        for (var idx = 0; idx <= 2; idx++) {
+        for (var idx = 0; idx <= 4; idx++) {
             var difficultyStr: string = "";
             if (idx <= 0) difficultyStr = hjow_trans("Easy");
             if (idx == 1) difficultyStr = hjow_trans("Normal");
-            if (idx >= 2) difficultyStr = hjow_trans("Hard");
+            if (idx == 2) difficultyStr = hjow_trans("Hard");
+            if (idx == 3) difficultyStr = hjow_trans("Extreme");
+            if (idx >= 4) difficultyStr = hjow_trans("Crazy");
             results += "<option value='" + idx + "'>" + hjow_serializeXMLString(difficultyStr) + "</option>";
         }
         results += "</select>";
@@ -1212,6 +1223,7 @@ class XCardAIPlayerCreator extends XCardPlayerCreator {
 class XCardTutorialPlayer extends XCardAIPlayer {
     public constructor(name: string) {
         super(name);
+        this.difficulty = 9;
     }
     public getPlayerTypeName(): string {
         return "Tutorial Assistant";
@@ -1244,7 +1256,7 @@ class XCardTutorialPlayer extends XCardAIPlayer {
         
     };
     public applyInputs(engine: XCardGameEngine, gameStarted: boolean, needHideScreen: boolean, showResult: boolean) {
-        this.difficulty = 0;
+        this.difficulty = 9;
     };
     public isNameEditable() {
         return false;
@@ -1303,7 +1315,7 @@ class XCardGameMode extends ModuleObject {
     public isGameAvailable(engine: XCardGameEngine, players: XCardPlayer[]): boolean {
         return (players.length >= 2);
     };
-    public createPlayers(): XCardPlayer[] {
+    public createPlayers(engine: XCardGameEngine): XCardPlayer[] {
         return null; // null 을 넣으면 메인화면에서 플레이어 지정 가능, null이 아니면 플레이어 지정 불가능하고 여기서 리턴한 대로 플레이어가 설정되며 플레이어 이름만 변경 가능
     };
     public init(playerCount: number) {
@@ -1363,6 +1375,9 @@ class XCardGameMode extends ModuleObject {
 
     };
     public onFinishGame(engine: XCardGameEngine, players: XCardPlayer[], deckObj: XCard[]) { // 게임 끝나고 호출
+
+    };
+    public afterResultPage(engine: XCardGameEngine, players: XCardPlayer[], deckObj: XCard[]) { // 게임 끝나고 결과 화면 로드 후 호출
 
     };
     public processPoint(player: XCardPlayer, beforeCalculated: TBigInt): TBigInt { // 점수 계산 직후 점수에 추가 연산 (리턴된 값이 계산 결과로 적용됨 ! any타입 매개변수 객체로는 bigInt 객체가 들어올 예정)
@@ -1452,7 +1467,7 @@ class XCardGameMultiplylessMode extends XCardGameDefaultMode {
     };
 };
 
-class XCardGameTutorial extends XCardGameDefaultMode {
+class XCardGameTutorial extends XCardGameSpeedMode {
     public constructor() {
         super();
         this.name = "Tutorial";
@@ -1465,8 +1480,10 @@ class XCardGameTutorial extends XCardGameDefaultMode {
     public isGameAvailable(engine: XCardGameEngine, players: XCardPlayer[]): boolean {
         return true;
     };
-    public createPlayers(): XCardPlayer[] {
-        var results = [];
+    public createPlayers(engine: XCardGameEngine): XCardPlayer[] {
+        var results: XCardPlayer[] = [];
+        var newCardHaves: XCard[] = [];
+        var newCard: XCard = null;
 
         var newPlayer: XCardPlayer = new XCardUserPlayer(hjow_trans("Player"));
         newPlayer.setUniqueIdFromMode(this, "p0");
@@ -1478,10 +1495,6 @@ class XCardGameTutorial extends XCardGameDefaultMode {
 
         newPlayer = new XCardTutorialPlayer(hjow_trans("AI") + " 2");
         newPlayer.setUniqueIdFromMode(this, "p2");
-        results.push(newPlayer);
-
-        newPlayer = new XCardTutorialPlayer(hjow_trans("AI") + " 3");
-        newPlayer.setUniqueIdFromMode(this, "p3");
         results.push(newPlayer);
 
         return results; // 메인화면에서 플레이어 설정 고정
@@ -1518,7 +1531,7 @@ class XCardGameTutorial extends XCardGameDefaultMode {
         return result;
     };
     public getEachPlayerTimeLimit(player: XCardPlayer, engine: XCardGameEngine): number {
-        return 30;
+        return 120;
     };
     public getHideTime(player: XCardPlayer, engine: XCardGameEngine): number {
         if (player.isUserControllable()) return 30;
@@ -1532,7 +1545,86 @@ class XCardGameTutorial extends XCardGameDefaultMode {
         return true;
     };
     public afterPrepareStartDefaultGame(engine: XCardGameEngine, players: XCardPlayer[], deckObj: XCard[]) { // 기본 모드 게임 준비 및 시작 처리 끝난 직후 수행함. 기본 모드 준비 작업 수행 시에만 호출됨에 유의!
+        engine.setTurnIndex(0, this);
+        var newPlayer: XCardPlayer = null;
+        var newCardHaves: XCard[] = [];
+        var newCard: XCard = null;
 
+        newPlayer = players[0];
+        newCardHaves = [];
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc01");
+        newCard.no = 5;
+        newCard.op = "＋";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc02");
+        newCard.no = 6;
+        newCard.op = "－";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc02");
+        newCard.no = -1;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newPlayer.setInventory(newCardHaves, engine);
+
+        newPlayer = players[1];
+        newCardHaves = [];
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc01");
+        newCard.no = 5;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc02");
+        newCard.no = 3;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc02");
+        newCard.no = 4;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newPlayer.setInventory(newCardHaves, engine);
+        newCardHaves = [];
+        newCard = new XCard();
+        newCard.no = 7;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newPlayer.setApplied(newCardHaves, engine);
+
+        newPlayer = players[2];
+        newCardHaves = [];
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc01");
+        newCard.no = 5;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc02");
+        newCard.no = 3;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.setUniqueId(engine, "pc02");
+        newCard.no = 4;
+        newCard.op = "×";
+        newCardHaves.push(newCard);
+        newPlayer.setInventory(newCardHaves, engine);
+        newCardHaves = [];
+        newCard = new XCard();
+        newCard.no = 6;
+        newCard.op = "－";
+        newCardHaves.push(newCard);
+        newCard = new XCard();
+        newCard.no = 7;
+        newCard.op = "－";
+        newCardHaves.push(newCard);
+        newPlayer.setApplied(newCardHaves, engine);
+
+        engine.setPauseTimeLimit(true, this);
+        
     };
     public beforeNextTurnWork(engine: XCardGameEngine, players: XCardPlayer[], deckObj: XCard[], turnNumber: number) { // 다음 플레이어에게 차례 넘기는 작업 수행 직전 호출
 
@@ -1571,6 +1663,7 @@ class XCardGameEngine extends ModuleObject {
     private beforeTurnPlayerIndex: number = 0;
     private needHideScreen: boolean = false;
     private hideScreenTime: number = 0;
+    private pauseTimeLimit: boolean = false;
     private showResult: boolean = false;
     private resultReason: string = null;
     private turnChanging: boolean = false;
@@ -1744,6 +1837,18 @@ class XCardGameEngine extends ModuleObject {
             this.players[idx].resetCards();
         }
     };
+    public setTurnIndex(turnPlayerIndex: number, mode: XCardGameMode) {
+        if (mode == null) return;
+        if (!(mode instanceof XCardGameMode)) return;
+        if (mode.getUniqueId() != this.getSelectedGameMode().getUniqueId()) return;
+        this.turnPlayerIndex = turnPlayerIndex;
+    };
+    public setTurnTime(turnPlayerTime: number, mode: XCardGameMode) {
+        if (mode == null) return;
+        if (!(mode instanceof XCardGameMode)) return;
+        if (mode.getUniqueId() != this.getSelectedGameMode().getUniqueId()) return;
+        this.turnPlayerTime = turnPlayerTime;
+    };
     public title() {
         this.gameStarted = false;
         // this.stopAllTimer(); // 타이머 종료 시 MS Edge 에서 게임 다시 시작 시 정상동작이 안됨
@@ -1783,7 +1888,8 @@ class XCardGameEngine extends ModuleObject {
             var selfAny = this.getSelfObject();
             this.addTimerIfNotExistName("LimitTimer", "Restrict the player's time", function () {
                 if (selfObj.turnChanging) return;
-                if (! selfObj.gameStarted) return;
+                if (!selfObj.gameStarted) return;
+                if (selfObj.pauseTimeLimit) return;
                 if (selfObj.needHideScreen) {
                     selfObj.hideScreenTime -= 1;
 
@@ -1843,6 +1949,12 @@ class XCardGameEngine extends ModuleObject {
         this.refreshPage();
         this.actPlayerTurnStopRequest = false;
         this.actPlayerTurnRequest = true;
+    };
+    public setPauseTimeLimit(pause: boolean, mode: XCardGameMode) {
+        if (mode == null) return;
+        if (!(mode instanceof XCardGameMode)) return;
+        if (this.getSelectedGameMode().getUniqueId() != mode.getUniqueId()) return;
+        this.pauseTimeLimit = pause;
     };
     protected prepareRecordingReplay() {
         this.replay = new XCardReplay();
@@ -1981,6 +2093,10 @@ class XCardGameEngine extends ModuleObject {
 
         var gameMode: XCardGameMode = this.getSelectedGameMode();
         gameMode.beforeNextTurnWork(this, this.players, this.deck, this.turnNumber + 1); // 값 수정 전이므로 수정후의 값을 만들어 보냄
+        if (!this.gameStarted) { // 게임 모드 쪽에서 게임을 종료했을 수도 있음
+            this.refreshPage(false);
+            return;
+        }
 
         this.turnNumber = this.turnNumber + 1; // 턴 번호 증가
 
@@ -2005,6 +2121,10 @@ class XCardGameEngine extends ModuleObject {
         this.turnPlayerTime = this.getSelectedGameMode().getEachPlayerTimeLimit(this.getPlayerNowTurn(), this);
         // this.getPlayerNowTurn().actOnTurn(this, this.getSelectedGameMode(), this.deck, this.players); // 이 시점에서 AI 처리하면 안됨
 
+        if (!this.gameStarted) { // 게임 모드 쪽에서 게임을 종료했을 수도 있음
+            this.refreshPage(false);
+            return;
+        }
         gameMode.afterNextTurnWork(this, this.players, this.deck, this.turnNumber);
 
         hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.getPlayerNowTurn().getName()));
@@ -2023,6 +2143,13 @@ class XCardGameEngine extends ModuleObject {
         }
         return null;
     };
+    public finishGameFromMode(reason: string, mode: XCardGameMode) {
+        if (mode == null) return;
+        if (!(mode instanceof XCardGameMode)) return;
+        if (this.getSelectedGameMode().getUniqueId() != mode.getUniqueId()) return;
+        this.resultReason = reason;
+        this.finishGame(true);
+    };
     private finishGame(normalReason: boolean = false) {
         //this.stopTimer("LimitTimer"); // timer stop 시 다시 게임시작 후 MS Edge 브라우저에서 동작 안함
         //this.stopTimer("AIProcessor");
@@ -2038,6 +2165,7 @@ class XCardGameEngine extends ModuleObject {
         if (this.isDebugMode()) hjow_log(hjow_trans("Debug mode was activated."));
         
         this.refreshPage(false);
+        gameMode.afterResultPage(this, this.players, this.deck);
         this.replay = null; // 화면 리프레시 이후에 리플레이 초기화 (결과 화면에서 리플레이 JSON 출력 후에 초기화하기 위함)
         this.resultReason = null;
     };
@@ -2167,7 +2295,7 @@ class XCardGameEngine extends ModuleObject {
         var gameMode = this.getSelectedGameMode();
         jq(this.placeArea).find('.div_game_mode_desc').text(hjow_trans(gameMode.getDescription()));
 
-        var modeDefinedPlayers: XCardPlayer[] = gameMode.createPlayers();
+        var modeDefinedPlayers: XCardPlayer[] = gameMode.createPlayers(this);
         if (modeDefinedPlayers != null) { // 게임 모드 내에 아예 플레이어 설정이 탑재된 경우 처리
             if (!onRecursives) { // 메인화면 리프레시 다시 해주어야 하므로 무한반복 방지 조치
                 // 설정이 탑재는 됐어도 플레이어 이름은 변경할 수 있으므로, 이름 동기화
@@ -3272,6 +3400,8 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("Easy", "쉬움");
         newLangSet.stringTable.set("Normal", "보통");
         newLangSet.stringTable.set("Hard", "어려움");
+        newLangSet.stringTable.set("Extreme", "극한");
+        newLangSet.stringTable.set("Crazy", "미친 난이도");
         newLangSet.stringTable.set("Player", "플레이어");
         newLangSet.stringTable.set("AI", "AI");
         newLangSet.stringTable.set("Add", "추가");
@@ -3322,7 +3452,7 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("How to play", "게임 방법");
         newLangSet.stringTable.set("Some features will be applied after restart.", "일부 기능은 재시작 후 적용됩니다.");
         newLangSet.stringTable.set("The user stop the game.", "사용자가 게임을 중단시켰습니다.");
-        newLangSet.stringTable.set("The player [[PLAYER]] does not have any card.", "플레이어 '[[PLAYER]]' 이/가 카드를 보유한 카드가 없습니다.");
+        newLangSet.stringTable.set("The player [[PLAYER]] does not have any card.", "플레이어 '[[PLAYER]]' 이/가 보유한 카드가 없습니다.");
         newLangSet.stringTable.set("The deck is empty.", "덱에 카드가 없습니다.");
         newLangSet.stringTable.set("There must be at least two players, and there is no maximum limit, but it is recommended that four players play. Support play with simple AI computer.", "플레이어는 최소 2명 이상이어야 하고, 최대 제한은 없지만 4명이서 플레이하는 것을 권장합니다.\n인공지능 컴퓨터와의 플레이를 지원합니다.");
         newLangSet.stringTable.set("This game is a turn-based card game.", "이 게임은 턴제 카드 게임입니다.");
