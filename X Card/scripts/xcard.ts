@@ -1569,6 +1569,7 @@ class XCardGameEngine extends ModuleObject {
         }
         this.placeArea = String(plcArea);
         hjow_prepareJQuery();
+        jq(plcArea).addClass('hjow_xcard_style_place');
         this.debugMode = debugMode;
         if (debugMode) {
             hjow_putEngine(this);
@@ -1706,6 +1707,15 @@ class XCardGameEngine extends ModuleObject {
             hjow_error(e);
         }
     };
+    protected getSelectedGameMode(): XCardGameMode {
+        return this.gameModeList[this.gameModeIndex];
+    };
+    protected getPlayerNowTurn(): XCardPlayer {
+        return this.players[this.turnPlayerIndex];
+    };
+    public isGameOn(): boolean {
+        return this.gameStarted;
+    };
     private clearAllPlayers() {
         for (var idx = 0; idx < this.players.length; idx++) {
             this.players[idx].resetCards();
@@ -1723,7 +1733,7 @@ class XCardGameEngine extends ModuleObject {
         hjow_log(hjow_trans("The game is preparing to start."));
 
         // 게임 모드별 처리
-        var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode: XCardGameMode = this.getSelectedGameMode();
 
         hjow_log(hjow_trans("Mode") + " : " + hjow_trans(gameMode.getName()));
         hjow_log(hjow_trans(gameMode.getDescription()));
@@ -1740,10 +1750,10 @@ class XCardGameEngine extends ModuleObject {
             if (this.turnPlayerIndex < 0) this.turnPlayerIndex = 0;
             if (this.turnPlayerIndex >= this.players.length - 1) this.turnPlayerIndex = this.players.length - 1;
 
-            var turnPlayer: XCardPlayer = this.players[this.turnPlayerIndex];
+            var turnPlayer: XCardPlayer = this.getPlayerNowTurn();
             
             // 제한 시간 세팅 (처음 시작하는 플레이어는 1초 혜택)
-            this.turnPlayerTime = this.gameModeList[this.gameModeIndex].getEachPlayerTimeLimit(turnPlayer, this) + 1;
+            this.turnPlayerTime = this.getSelectedGameMode().getEachPlayerTimeLimit(turnPlayer, this) + 1;
 
             // 시간 제한
             var selfObj = this;
@@ -1805,7 +1815,7 @@ class XCardGameEngine extends ModuleObject {
 
         hjow_log(hjow_trans("Game is started."));
         if (this.isDebugMode) hjow_log(hjow_trans("Debug mode was activated."));
-        hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.players[this.turnPlayerIndex].getName()));
+        hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.getPlayerNowTurn().getName()));
         
         this.refreshPage();
         this.actPlayerTurnStopRequest = false;
@@ -1829,7 +1839,7 @@ class XCardGameEngine extends ModuleObject {
             }
             this.replay.players.push(cloned);
         }
-        this.replay.gameMode = this.gameModeList[this.gameModeIndex].getClassName();
+        this.replay.gameMode = this.getSelectedGameMode().getClassName();
         this.replay.deck = [];
         for (var cdx = 0; cdx < this.deck.length; cdx++) {
             var newCardObj = this.deck[cdx].toPlainObjectDetail(this);
@@ -1847,7 +1857,7 @@ class XCardGameEngine extends ModuleObject {
         return this.actPlayerTurnStopRequest;
     };
     public isThisTurn(player: XCardPlayer): boolean {
-        if (this.players[this.turnPlayerIndex].getUniqueId() == player.getUniqueId()) return true;
+        if (this.getPlayerNowTurn().getUniqueId() == player.getUniqueId()) return true;
         return false;
     };
     public getLeftTime(): number {
@@ -1859,7 +1869,7 @@ class XCardGameEngine extends ModuleObject {
     public setDeck(cards: XCard[], mode: XCardGameMode) {
         if (mode == null) return;
         if (!(mode instanceof XCardGameMode)) return;
-        if (this.gameModeList[this.gameModeIndex].getUniqueId() != mode.getUniqueId()) return;
+        if (this.getSelectedGameMode().getUniqueId() != mode.getUniqueId()) return;
 
         this.deck = cards;
     };
@@ -1905,7 +1915,7 @@ class XCardGameEngine extends ModuleObject {
         return false;
     };
     private spreadCards() {
-        var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode: XCardGameMode = this.getSelectedGameMode();
         gameMode.init(this.players.length);
 
         for (var idx = 0; idx < this.players.length; idx++) {
@@ -1946,7 +1956,7 @@ class XCardGameEngine extends ModuleObject {
         this.turnChanging = true;
         this.actPlayerTurnStopRequest = true;
 
-        var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode: XCardGameMode = this.getSelectedGameMode();
         gameMode.beforeNextTurnWork(this, this.players, this.deck, this.turnNumber + 1); // 값 수정 전이므로 수정후의 값을 만들어 보냄
 
         this.turnNumber = this.turnNumber + 1; // 턴 번호 증가
@@ -1955,10 +1965,10 @@ class XCardGameEngine extends ModuleObject {
             this.finishGame(true);
             return;
         }
-        
-        var beforePlayer: XCardPlayer = this.players[this.turnPlayerIndex];
-        if (this.gameModeList[this.gameModeIndex].needHide(beforePlayer, this)) {
-            this.hideScreenTime = this.gameModeList[this.gameModeIndex].getHideTime(beforePlayer, this);
+
+        var beforePlayer: XCardPlayer = this.getPlayerNowTurn();
+        if (this.getSelectedGameMode().needHide(beforePlayer, this)) {
+            this.hideScreenTime = this.getSelectedGameMode().getHideTime(beforePlayer, this);
             this.needHideScreen = true;
         }
 
@@ -1967,12 +1977,12 @@ class XCardGameEngine extends ModuleObject {
         if (this.turnPlayerIndex >= this.players.length) {
             this.turnPlayerIndex = 0;
         }
-        this.turnPlayerTime = this.gameModeList[this.gameModeIndex].getEachPlayerTimeLimit(this.players[this.turnPlayerIndex], this);
-        // this.players[this.turnPlayerIndex].actOnTurn(this, this.gameModeList[this.gameModeIndex], this.deck, this.players); // 이 시점에서 AI 처리하면 안됨
+        this.turnPlayerTime = this.getSelectedGameMode().getEachPlayerTimeLimit(this.getPlayerNowTurn(), this);
+        // this.getPlayerNowTurn().actOnTurn(this, this.getSelectedGameMode(), this.deck, this.players); // 이 시점에서 AI 처리하면 안됨
 
         gameMode.afterNextTurnWork(this, this.players, this.deck, this.turnNumber);
 
-        hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.players[this.turnPlayerIndex].getName()));
+        hjow_log(hjow_replaceStr(hjow_trans("Your turn, [[PLAYER]]."), "[[PLAYER]]", this.getPlayerNowTurn().getName()));
 
         this.actPlayerTurnStopRequest = false;
         this.actPlayerTurnRequest = true;
@@ -2000,7 +2010,7 @@ class XCardGameEngine extends ModuleObject {
         } else {
             this.showResult = false;
         }
-        var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode: XCardGameMode = this.getSelectedGameMode();
         gameMode.onFinishGame(this, this.players, this.deck);
 
         hjow_log(hjow_trans("Game is finished."));
@@ -2132,7 +2142,7 @@ class XCardGameEngine extends ModuleObject {
         }
     };
     protected refreshMainGameMode(onRecursives: boolean = false) {
-        var gameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode = this.getSelectedGameMode();
         jq(this.placeArea).find('.div_game_mode_desc').text(hjow_trans(gameMode.getDescription()));
 
         var modeDefinedPlayers: XCardPlayer[] = gameMode.createPlayers();
@@ -2176,7 +2186,7 @@ class XCardGameEngine extends ModuleObject {
     };
     protected refreshGame() {
         jq(this.placeArea).find('.table_player_arena_each').removeClass('current_turn');
-        var currentPlayer: XCardPlayer = this.players[this.turnPlayerIndex];
+        var currentPlayer: XCardPlayer = this.getPlayerNowTurn();
         
         if (currentPlayer.isUserControllable()) {
             jq(this.placeArea).find('.btn_user_control').removeProp('disabled');
@@ -2197,7 +2207,7 @@ class XCardGameEngine extends ModuleObject {
 
             var placeObj = jq(this.placeArea).find(".pplace_" + hjow_serializeString(playerOne.getUniqueId()));
             placeObj.find(".player_inventory_card_count").text(playerOne.getInventoryCardCount());
-            placeObj.find(".point_number").text(playerOne.getCurrentPoint(this.gameModeList[this.gameModeIndex]).toString());
+            placeObj.find(".point_number").text(playerOne.getCurrentPoint(this.getSelectedGameMode()).toString());
 
             // Inventory Synchronizing
             var invenSel = placeObj.find(".select_player_arena.inventory");
@@ -2356,7 +2366,7 @@ class XCardGameEngine extends ModuleObject {
         }
     };
     private refreshResult() {
-        var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode: XCardGameMode = this.getSelectedGameMode();
         jq(this.placeArea).find('.replay_result').hide();
         for (var idx = 0; idx < this.players.length; idx++) {
             var playerOne: XCardPlayer = this.players[idx];
@@ -2572,7 +2582,7 @@ class XCardGameEngine extends ModuleObject {
         return results;
     };
     protected resultPageHTML(): string {
-        var gameMode: XCardGameMode = this.gameModeList[this.gameModeIndex];
+        var gameMode: XCardGameMode = this.getSelectedGameMode();
         var results: string = "";
         results += "<table class='element e057 full layout'>" + "\n";
         results += "   <tr class='element e058'>" + "\n";
@@ -2589,7 +2599,7 @@ class XCardGameEngine extends ModuleObject {
         var lastPlayerPoint: TBigInt = null;
         for (var idx = 0; idx < playerOrders.length; idx++) {
             var playerOne: XCardPlayer = playerOrders[idx];
-            var playerPoint: TBigInt = playerOne.getCurrentPoint(this.gameModeList[this.gameModeIndex]);
+            var playerPoint: TBigInt = playerOne.getCurrentPoint(this.getSelectedGameMode());
             if (lastPlayerPoint == null || lastPlayerPoint.compare(playerPoint) > 0) {
                 lastPlayerPoint = playerPoint;
                 orderNo++;
@@ -2824,7 +2834,7 @@ class XCardGameEngine extends ModuleObject {
         }
     };
     public payHere(targetPlayerUniqueId: string, cardUniqueId: string): string {
-        var player: XCardPlayer = this.players[this.turnPlayerIndex]; // 현재 턴의 플레이어
+        var player: XCardPlayer = this.getPlayerNowTurn(); // 현재 턴의 플레이어
         var targetPlayer: XCardPlayer = this.findPlayer(targetPlayerUniqueId); // 대상 플레이어
         
         var errMsg: string = targetPlayer.canPayByUniqId(cardUniqueId, player);
