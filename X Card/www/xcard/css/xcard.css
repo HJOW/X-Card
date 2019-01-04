@@ -262,7 +262,7 @@ limitations under the License.
     border: 1px solid lightgray;
 }
 
-.hjow_xcard_style_place .setting_element p {
+.hjow_xcard_style_place .setting_element p, .hjow_xcard_style_place .setting_element pre {
     font-size: 11px;
 }
 
