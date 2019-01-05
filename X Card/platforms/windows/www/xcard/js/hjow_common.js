@@ -1,4 +1,4 @@
-﻿var hjow = {};
+var hjow = {};
 var h = hjow;
 h.property = {};
 h.property.screenWidth = 1024;
@@ -578,6 +578,67 @@ function hjow_tryExit() {
 }
 ;
 h.tryExit = hjow_tryExit;
+function hjow_select_init(selectObj) {
+    var selObj = $(selectObj);
+    var randomNo = selObj.attr('selalt');
+    if (!(randomNo == null || typeof (randomNo) == 'undefined' || randomNo == '')) {
+        var altObj = $('.selalter.div_' + randomNo);
+        altObj.find('.selalter_option').off('click');
+        altObj.remove();
+        selObj.removeClass('sel_' + randomNo);
+    }
+    var parent = selObj.parent();
+    randomNo = String(Math.round(Math.random() * 999999999));
+    randomNo = randomNo + String(Math.round(Math.random() * 999999999));
+    selObj.addClass('hidden');
+    selObj.addClass('sel_' + randomNo);
+    selObj.attr('selalt', randomNo);
+    var newSelTags = "<div class='selalter div_" + randomNo + "' selalt='" + randomNo + "'></div>";
+    parent.append(newSelTags);
+    hjow_select_sync(selectObj);
+}
+;
+h.select_init = hjow_select_init;
+function hjow_select_sync(selectObj) {
+    var jqObj = $(selectObj);
+    var randomNo = jqObj.attr('selalt');
+    var selObj = $('.sel_' + randomNo);
+    var altObj = $('.div_' + randomNo);
+    altObj.find('.selalter_option').off('click');
+    altObj.find('.selalter_option').remove();
+    var options = selObj.find('option');
+    options.each(function () {
+        var addiClass = '';
+        var valueOf = $(this).attr('value');
+        if (valueOf == selObj.val())
+            addiClass = addiClass + ' selected';
+        if ($(this).is('.concealed'))
+            addiClass = addiClass + ' concealed';
+        if ($(this).is('.hidden'))
+            addiClass = addiClass + ' hidden';
+        altObj.append("<div class='selalter_option opt_" + randomNo + addiClass + "' value=\"" + hjow_serializeString(valueOf) + "\" onclick=\"hjow_select_onClick('" + randomNo + "', '" + hjow_serializeString(valueOf) + "', this); return false;\">" + hjow_serializeXMLString($(this).text()) + "</div>");
+    });
+}
+;
+h.select_sync = hjow_select_sync;
+function hjow_select_onClick(randomNo, value, selAlterObj) {
+    var selObj = $('.sel_' + randomNo);
+    var altObj = $('.div_' + randomNo);
+    selObj.val(value);
+    var selAlters = altObj.find('.selalter_option');
+    selAlters.removeClass('selected');
+    $(selAlterObj).addClass('selected');
+}
+;
+h.select_onClick = hjow_select_onClick;
+function hjow_runAfter(actFunc, timemills) {
+    var tempTimer = setTimeout(function () {
+        actFunc();
+        clearTimeout(tempTimer);
+    }, timemills);
+}
+;
+h.runAfter = hjow_runAfter;
 function hjow_ajax(obj) {
     $.ajax(obj);
 }

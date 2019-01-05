@@ -1,4 +1,4 @@
-﻿var __extends = (this && this.__extends) || (function () {
+var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
         function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
@@ -38,7 +38,9 @@ var jqo = {
     height: function (a) { this.warnJQuery(); return 0; },
     is: function (a) { this.warnJQuery(); return false; },
     dialog: function () { this.warnJQuery(); return self; },
-    isArray: function (a) { this.warnJQuery(); return Array.isArray(a); }
+    isArray: function (a) { this.warnJQuery(); return Array.isArray(a); },
+    parent: function () { return jqo; },
+    parents: function () { return jqo; }
 };
 var jq = function (obj) {
     return jqo;
@@ -1993,6 +1995,21 @@ var XCardGameEngine = (function (_super) {
         this.gameModeList.push(new XCardGameDefaultMode());
         this.gameModeList.push(new XCardGameSpeedMode());
         this.gameModeList.push(new XCardGameMultiplylessMode());
+        var useBrowserSelectOpt = this.getProperty('use_browser_select');
+        var screenApplySpeed = this.getProperty('screen_apply_speed');
+        if (useBrowserSelectOpt == null || typeof (useBrowserSelectOpt) == 'undefined' || useBrowserSelectOpt == '') {
+            if (hjow_getPlatform() == 'android') {
+                useBrowserSelectOpt = "false";
+            }
+            else {
+                useBrowserSelectOpt = "true";
+            }
+            this.setProperty('use_browser_select', useBrowserSelectOpt);
+        }
+        if (screenApplySpeed == null || typeof (screenApplySpeed) == 'undefined' || screenApplySpeed == '') {
+            screenApplySpeed = "300";
+            this.setProperty('screen_apply_speed', screenApplySpeed);
+        }
     };
     ;
     XCardGameEngine.prototype.applyProperties = function () {
@@ -2481,6 +2498,9 @@ var XCardGameEngine = (function (_super) {
     XCardGameEngine.prototype.refreshPage = function (heavyRefresh) {
         if (heavyRefresh === void 0) { heavyRefresh = true; }
         this.applyInputs();
+        if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser') {
+            jq(this.placeArea).find('.selalter_option').off('click');
+        }
         if (heavyRefresh) {
             jq(this.placeArea).find('.page_game').html(hjow_toStaticHTML(this.gamePageHTML()));
             jq(this.placeArea).find('.page_main').html(hjow_toStaticHTML(this.mainPageHTML()));
@@ -2657,9 +2677,11 @@ var XCardGameEngine = (function (_super) {
         for (var pdx = 0; pdx < this.players.length; pdx++) {
             var playerOne = this.players[pdx];
             var thisTurn = (pdx == this.turnPlayerIndex);
+            var formulaContent = playerOne.listAppliedAsString();
             var placeObj = jq(this.placeArea).find(".pplace_" + hjow_serializeString(playerOne.getUniqueId()));
             placeObj.find(".player_inventory_card_count").text(playerOne.getInventoryCardCount());
             placeObj.find(".point_number").text(playerOne.getCurrentPoint(this.getSelectedGameMode()).toString());
+            placeObj.find(".point_number").attr('title', formulaContent);
             var invenSel = placeObj.find(".select_player_arena.inventory");
             var invenObjs = invenSel.find("option");
             var invenOptList = [];
@@ -2710,11 +2732,15 @@ var XCardGameEngine = (function (_super) {
                 concealedOpt = invenSel.find("option.concealed");
             }
             if (thisTurn && (!(playerOne.needToHideInventoryForSelf()))) {
+                invenObjs.removeClass('hidden');
                 invenObjs.show();
+                concealedOpt.addClass('hidden');
                 concealedOpt.hide();
             }
             else {
+                invenObjs.addClass('hidden');
                 invenObjs.hide();
+                concealedOpt.removeClass('hidden');
                 concealedOpt.show();
             }
             var affectorSel = placeObj.find(".select_player_arena.affector");
@@ -2762,38 +2788,58 @@ var XCardGameEngine = (function (_super) {
                 var newOptionHTML = "<option value='" + hjow_serializeString(targetCard.getUniqueId()) + "'>" + hjow_serializeXMLString(targetCard.toString()) + "</option>";
                 affectorSel.append(hjow_toStaticHTML(newOptionHTML));
             }
+            affectorSel.attr('title', formulaContent);
             affectorObjs = affectorSel.find("option");
             if (affectorObjs.length >= 1) {
                 affectorSel.val(jq(affectorObjs[affectorObjs.length - 1]).attr('value'));
+                if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser') {
+                    hjow_select_sync(affectorSel);
+                }
             }
         }
         this.initTheme(1, false);
-        var heightVal = jq(this.placeArea).height();
-        if (heightVal < 500)
-            heightVal = 500;
-        var widthVal = jq(this.placeArea).width();
-        if (widthVal < 700)
-            widthVal = 700;
-        jq(this.placeArea).find('.player_arena_div').css('min-height', heightVal - 200 + 'px');
-        jq(this.placeArea).find('.player_arena_div').css('max-height', heightVal - 100 + 'px');
-        jq(this.placeArea).find('.player_arena_div').css('max-width', widthVal - 5 + 'px');
-        jq(this.placeArea).find('.div_player_arena_each').css('min-height', heightVal - 210 + 'px');
-        jq(this.placeArea).find('.div_player_arena_each').css('max-height', heightVal - 110 + 'px');
-        jq(this.placeArea).find('.table_player_arena_each').css('min-height', heightVal - 220 + 'px');
-        jq(this.placeArea).find('.table_player_arena_each').css('max-height', heightVal - 120 + 'px');
-        jq(this.placeArea).find('.table_player_arena_each').each(function () {
-            var heightLefts = jq(jq(this).find('.player_arena_one_line_layout')[0]).height() * 4;
-            var thisHeight = jq(this).height();
-            if (thisHeight < 200)
-                thisHeight = heightVal - 220;
-            var heightIn = thisHeight - heightLefts - 10;
-            if (heightIn < 200)
-                heightIn = 250;
-            jq(this).find('select').height(heightIn - 10);
-        });
         for (var idx = 0; idx < this.players.length; idx++) {
             this.players[idx].refreshGame(this);
         }
+        var selfObj = this;
+        hjow_runAfter(function () {
+            var heightVal = jq(selfObj.placeArea).height();
+            if (heightVal < 500)
+                heightVal = 500;
+            var widthVal = jq(selfObj.placeArea).width();
+            if (widthVal < 700)
+                widthVal = 700;
+            jq(selfObj.placeArea).find('.player_arena_div').css('min-height', heightVal - 200 + 'px');
+            jq(selfObj.placeArea).find('.player_arena_div').css('max-height', heightVal - 100 + 'px');
+            jq(selfObj.placeArea).find('.player_arena_div').css('max-width', widthVal - 5 + 'px');
+            jq(selfObj.placeArea).find('.div_player_arena_each').css('min-height', heightVal - 210 + 'px');
+            jq(selfObj.placeArea).find('.div_player_arena_each').css('max-height', heightVal - 110 + 'px');
+            jq(selfObj.placeArea).find('.table_player_arena_each').css('min-height', heightVal - 220 + 'px');
+            jq(selfObj.placeArea).find('.table_player_arena_each').css('max-height', heightVal - 120 + 'px');
+            jq(selfObj.placeArea).find('.table_player_arena_each').each(function () {
+                var heightLefts = jq(jq(this).find('.player_arena_one_line_layout')[0]).height() * 4;
+                var thisHeight = jq(this).height();
+                if (thisHeight < 220)
+                    thisHeight = heightVal - 220;
+                var heightSelCon = jq(this).find('.td_select_container').height() - 10;
+                var heightIn = heightSelCon;
+                if (heightIn < 200)
+                    heightIn = thisHeight - heightLefts - 10;
+                if (heightIn < 200)
+                    heightIn = 200;
+                if (heightIn >= heightSelCon)
+                    heightIn = heightSelCon;
+                jq(this).find('select').height(heightIn - 10);
+            });
+            if (!hjow_parseBoolean(selfObj.getProperty('use_browser_select'))) {
+                jq(selfObj.placeArea).find('select.need_alter').each(function () {
+                    hjow_select_init(this);
+                });
+                var insideHeight = jq(selfObj.placeArea).find('.td_select_container').height();
+                jq(selfObj.placeArea).find('.selalter').css('max-height', insideHeight - 5);
+                jq(selfObj.placeArea).find('.selalter').css('height', insideHeight - 5);
+            }
+        }, parseInt(selfObj.getProperty('screen_apply_speed')));
     };
     ;
     XCardGameEngine.prototype.refreshResult = function () {
@@ -3152,11 +3198,11 @@ var XCardGameEngine = (function (_super) {
             results += "   </tr>";
             results += "   <tr class='element e113'>";
             results += "      <td class='element e114 td_select_container'>";
-            results += "         <select multiple class='element e115 select_player_arena inventory pinventory_" + hjow_serializeString(player.getUniqueId()) + "'>";
+            results += "         <select multiple class='element e115 select_player_arena inventory pinventory_" + hjow_serializeString(player.getUniqueId()) + " need_alter'>";
             results += "         </select>";
             results += "      </td>";
             results += "      <td class='element e116 td_select_container'>";
-            results += "         <select multiple class='element e117 select_player_arena affector paffector_" + hjow_serializeString(player.getUniqueId()) + "'>";
+            results += "         <select multiple class='element e117 select_player_arena affector paffector_" + hjow_serializeString(player.getUniqueId()) + " need_alter'>";
             results += "         </select>";
             results += "      </td>";
             results += "   </tr>";
