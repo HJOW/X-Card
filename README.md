@@ -2,7 +2,7 @@
 
 ## 테스트 버전 플레이
 
-http://netstorm.woobi.co.kr/xcard/xcard.html 에 방문해 주세요.
+http://netstorm.woobi.co.kr/xcard/ 에 방문해 주세요.
 지원하는 웹 브라우저
   Google Chrome (60 이상)
   Mozilla Firefox (52 이상)
