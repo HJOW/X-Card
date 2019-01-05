@@ -19,8 +19,6 @@
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
 
-        try { screen.orientation.lock('landscape'); } catch (e) { }
-
         execXCard();
     };
 
@@ -37,6 +35,7 @@
     };
 
     function execXCard() {
+        try { screen.orientation.lock('landscape'); } catch (e) { }
         location.href = "./xcard/xcard.html";
     };
 } )();

@@ -2041,6 +2041,7 @@ var XCardGameEngine = (function (_super) {
         bodyHtml += "<div class='page page_result'></div>\n";
         bodyHtml += "<div class='page page_set'></div>\n";
         bodyHtml += "<div class='toolbar'></div>\n";
+        bodyHtml += "<div class='scriptTest advanceMode'><input type='text' class='tx_console_run'/><button type='button' class='btn_console_run'>" + hjow_serializeXMLString(hjow_trans("Run")) + "</button></div>\n";
         jq(this.placeArea).html(hjow_toStaticHTML(bodyHtml));
         jq('body').append("<div class='hjow_xcard_how_to_play_dialog' style='width: 400px; height: 300px; display: none' title=\"" + hjow_serializeString(hjow_trans("How to play")) + "\"></div>");
         this.prepareHowToPlayDialog();
@@ -3195,6 +3196,9 @@ var XCardGameEngine = (function (_super) {
         }
         results += "   <button type='button' class='element e131 btn_show_log'> " + hjow_serializeXMLString(hjow_trans("Show Log")) + "</button>";
         results += "   <button type='button' class='element e132 btn_delete_log'>" + hjow_serializeXMLString(hjow_trans("Delete Log")) + "</button>";
+        var platformInfo = hjow_getPlatform();
+        if (!(platformInfo == 'ios' || platformInfo == 'browser'))
+            results += "   <button type='button' class='element e132 btn_exit'>" + hjow_serializeXMLString(hjow_trans("Exit")) + "</button>";
         results += "</div>";
         results += "<div class='element e133 toolbar_element'>";
         results += "<span class='element e134 madeby'>Made by HJOW (hujinone22@naver.com)</span>";
@@ -3375,6 +3379,7 @@ var XCardGameEngine = (function (_super) {
     };
     ;
     XCardGameEngine.prototype.refreshEvents = function () {
+        var selfObj = this;
         var selfAny = this.getSelfObject();
         var pageArea = jq(this.placeArea);
         this.removeButtonEvent(pageArea.find('button'));
@@ -3426,6 +3431,13 @@ var XCardGameEngine = (function (_super) {
         });
         this.reAllocateButtonEvent(jq('.btn_show_how_to'), function (compObj) {
             selfAny.showHowToPlayDialog();
+        });
+        this.reAllocateButtonEvent(jq('.btn_console_run'), function (compObj) {
+            hjow_log(eval(jq(selfObj.placeArea).find('.tx_console_run').val()));
+            hjow_openLogDialog();
+        });
+        this.reAllocateButtonEvent(jq('.btn_exit'), function (compObj) {
+            hjow_tryExit();
         });
     };
     ;
@@ -3485,7 +3497,7 @@ var XCardGameEngine = (function (_super) {
             selfObj.applySettings();
             if (selfObj.isDebugMode()) {
                 selfObj.showSettings = false;
-                selfObj.refreshPage(false);
+                selfObj.refreshPage();
             }
             else {
                 selfAny.events.main.btn_go_main();
@@ -3645,6 +3657,8 @@ var XCardGameEngine = (function (_super) {
         newLangSet.stringTable = new Properties();
         newLangSet.stringTable.set("Language", "언어");
         newLangSet.stringTable.set("Settings", "설정");
+        newLangSet.stringTable.set("Run", "실행");
+        newLangSet.stringTable.set("Exit", "종료");
         newLangSet.stringTable.set("Go back to main", "메인으로 돌아가기");
         newLangSet.stringTable.set("Show Log", "로그 보기");
         newLangSet.stringTable.set("Delete Log", "로그 지우기");

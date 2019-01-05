@@ -437,7 +437,11 @@ function hjow_toStaticHTML(htmlStr) {
 ;
 h.toStaticHTML = hjow_toStaticHTML;
 function hjow_workOnDocumentReady(actionFunc) {
-    $(document).ready(function () {
+    var flags = false;
+    var newFunc = function () {
+        if (flags)
+            return;
+        flags = true;
         if (!hjow_isSupportedBrowser()) {
             hjow_alert('This browser or platform is not supported.');
             return;
@@ -460,7 +464,14 @@ function hjow_workOnDocumentReady(actionFunc) {
         if (actionFunc == null || typeof (actionFunc) == 'undefined')
             return;
         actionFunc(actionFuncParam);
+    };
+    $(document).ready(function () {
+        var tempTimer = setTimeout(function () {
+            newFunc();
+            clearTimeout(tempTimer);
+        }, 1000);
     });
+    document.addEventListener('deviceready', newFunc, false);
 }
 ;
 h.workOnDocumentReady = hjow_workOnDocumentReady;
@@ -524,12 +535,45 @@ function hjow_supportES6() {
     }
 }
 ;
+h.supportES6 = hjow_supportES6;
 function hjow_supportES5() {
     if (Object.create == null || typeof (Object.create) == 'undefined')
         return false;
     return true;
 }
 ;
+h.supportES5 = hjow_supportES5;
+function hjow_getDeviceInfo() {
+    if (typeof (device) == 'undefined')
+        return {
+            platform: 'browser'
+        };
+    return device;
+}
+;
+h.getDeviceInfo = hjow_getDeviceInfo;
+function hjow_getPlatform() {
+    var deviceObj = hjow_getDeviceInfo();
+    return String(deviceObj.platform).toLowerCase();
+}
+;
+h.getPlatform = hjow_getPlatform;
+function hjow_tryExit() {
+    try {
+        navigator.device.exitApp();
+    }
+    catch (e) { }
+    try {
+        device.exitApp();
+    }
+    catch (e) { }
+    try {
+        window.close();
+    }
+    catch (e) { }
+}
+;
+h.tryExit = hjow_tryExit;
 function hjow_ajax(obj) {
     $.ajax(obj);
 }
