@@ -568,6 +568,10 @@ function hjow_tryExit() {
     }
     catch (e) { }
     try {
+        xcard_interface.exit();
+    }
+    catch (e) { }
+    try {
         window.close();
     }
     catch (e) { }

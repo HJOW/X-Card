@@ -20,6 +20,8 @@
 package hjow.game.xcard;
 
 import android.os.Bundle;
+import android.webkit.WebView;
+
 import org.apache.cordova.*;
 
 public class MainActivity extends CordovaActivity
@@ -28,7 +30,12 @@ public class MainActivity extends CordovaActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        super.init();
+
         // Set by <content src="index.html" /> in config.xml
         loadUrl(launchUrl);
+
+        WebView view = (WebView) appView.getEngine().getView();
+        view.addJavascriptInterface(new XCardInterface(this), "xcard_interface");
     }
 }

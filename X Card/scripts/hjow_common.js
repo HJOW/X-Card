@@ -598,6 +598,7 @@ h.getPlatform = hjow_getPlatform;
 function hjow_tryExit() {
     try { navigator.device.exitApp(); } catch (e) { }
     try { device.exitApp(); } catch (e) { }
+    try { xcard_interface.exit(); } catch (e) { }
     try { window.close(); } catch (e) { }
 };
 
