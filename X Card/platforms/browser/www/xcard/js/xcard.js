@@ -2041,7 +2041,6 @@ var XCardGameEngine = (function (_super) {
         bodyHtml += "<div class='page page_result'></div>\n";
         bodyHtml += "<div class='page page_set'></div>\n";
         bodyHtml += "<div class='toolbar'></div>\n";
-        bodyHtml += "<div class='scriptTest advanceMode'><input type='text' class='tx_console_run'/><button type='button' class='btn_console_run'>" + hjow_serializeXMLString(hjow_trans("Run")) + "</button></div>\n";
         jq(this.placeArea).html(hjow_toStaticHTML(bodyHtml));
         jq('body').append("<div class='hjow_xcard_how_to_play_dialog' style='width: 400px; height: 300px; display: none' title=\"" + hjow_serializeString(hjow_trans("How to play")) + "\"></div>");
         this.prepareHowToPlayDialog();
@@ -2968,6 +2967,7 @@ var XCardGameEngine = (function (_super) {
         results += "      <textarea class='element e032 tx_theme_script tx_theme_script_2'></textarea>" + "\n";
         results += "   </p>" + "\n";
         results += "</div>" + "\n";
+        results += "<div class='element setting_element scriptTest advanceMode'><input type='text' class='tx_console_run'/><button type='button' class='btn_console_run'>" + hjow_serializeXMLString(hjow_trans("Run")) + "</button></div>\n";
         results += "</div>" + "\n";
         results += "<div class='element e033 setting_element setting_buttons_bottom'>" + "\n";
         results += "   <p class='element e034'>" + "\n";
