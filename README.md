@@ -97,7 +97,8 @@ http://netstorm.woobi.co.kr/xcalc/xcard.html 에 방문해 주세요.
    The player with the highest score wins.
 
 ## 사용된 외부 라이브러리 (Dependencies)
-
+   * Cordova : https://cordova.apache.org/
+       (license : Apache License 2.0)
    * jQuery : https://jquery.com/
        (license : MIT)
    * jQuery UI : https://jqueryui.com/
