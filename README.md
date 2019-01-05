@@ -8,6 +8,9 @@ http://netstorm.woobi.co.kr/xcard/xcard.html 에 방문해 주세요.
   Mozilla Firefox (52 이상)
   Microsoft Edge (Windows 10 빌드 1803 내장 버전 이상)
   
+또는 안드로이드 알파 버전을 플레이해 보세요.
+https://github.com/HJOW/X-Card/edit/master/release/xcard_20190106_0230.apk
+  
 
 ## 이 프로젝트는? (What is this project?)
 
