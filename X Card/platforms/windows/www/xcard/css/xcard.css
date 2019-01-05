@@ -1,0 +1,292 @@
+﻿
+/*
+This CSS file is made by HJOW.
+E-mail : hujinone22@naver.com
+
+This css file need following libraries : jQuery UI, hjow_common.
+
+jQuery UI : https://jqueryui.com/
+*/
+/*
+Copyright 2018 HJOW (hujinone22@naver.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+.hjow_xcard_style_place {
+    min-width: 790px;
+    min-height: 590px;
+}
+.hjow_xcard_style_place div.debugMode, td.debugMode {
+    border: 1px solid gray !important;
+}
+
+.hjow_xcard_style_place td.td_game_title {
+    height: 30px;
+}
+
+.hjow_xcard_style_place td.td_game_title h2, td.td_game_title h1 {
+    font-size: 25px;
+}
+
+.hjow_xcard_style_place td.td_player {
+    border: 2px solid gray;
+}
+
+.hjow_xcard_style_place td.td_player td{
+    border: 1px solid lightgray;
+}
+.hjow_xcard_style_place button {
+    margin-right: 2px;
+}
+
+.hjow_xcard_style_place button.btn_game_start {
+    font-size: 20px;
+}
+
+.hjow_xcard_style_place td.td_player_list table.player_list tr:not(.tr_player_empty), td.td_player_list table.player_list td:not(.td_player_empty), td.td_player_list table.player_list table.player_each, td.td_player_list table.player_list table.player_each td {
+    width: 100%;
+    max-height: 100px;
+}
+
+.hjow_xcard_style_place table.player_each {
+    height: 60px;
+}
+
+.hjow_xcard_style_place div.player_list_div {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    min-height: 300px;
+    height: 100%;
+    border:1px solid black;
+}
+
+.hjow_xcard_style_place div.player_arena_div {
+    overflow-x: scroll;
+    overflow-y: auto;
+    min-height: 300px;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: row;
+    flex-basis: 33%;
+}
+
+.hjow_xcard_style_place td.td_deck, td.td_game_status {
+    height: 30px;
+}
+
+.hjow_xcard_style_place td.td_player_arena_each, table.table_player_arena_each {
+    min-height: 300px;
+    min-width: 100px;
+    max-width: 300px;
+}
+
+.hjow_xcard_style_place div.div_player_arena_each {
+    height: 100%;
+    flex: 0 0 auto;
+}
+
+.hjow_xcard_style_place table.table_player_arena_each td {
+    border: 1px solid lightgray;
+}
+
+.hjow_xcard_style_place select.select_player_arena {
+    width: 100%;
+    height: 100%;
+    min-width: 120px;
+    min-height: 150px;
+}
+
+.hjow_xcard_style_place .player_arena_one_line_layout {
+    height: 30px;
+}
+
+.hjow_xcard_style_place table.table_player_arena_each.current_turn {
+    border: 3px solid green;
+}
+
+.hjow_xcard_style_place table.table_player_arena_each:not(.current_turn) {
+    border: 1px solid darkgray;
+}
+
+.hjow_xcard_style_place .progress {
+    width: 100%;
+}
+
+.hjow_xcard_style_place .table_each_player_result {
+    border: 2px solid gray;
+    width: 100%;
+    max-height: 120px;
+}
+
+.hjow_xcard_style_place .table_each_player_result.order_player_1 {
+    border: 3px solid gold;
+}
+
+.hjow_xcard_style_place .table_each_player_result.order_player_2 {
+    border: 3px solid silver;
+}
+
+.hjow_xcard_style_place .table_each_player_result.order_player_3 {
+    border: 3px solid orange;
+}
+
+.hjow_xcard_style_place .table_each_player_result.order_player_last {
+    border: 3px solid purple;
+}
+
+.hjow_xcard_style_place .table_each_player_result td {
+    border: 1px solid lightgray;
+}
+
+.hjow_xcard_style_place .table_each_player_result td.label {
+    width: 100px;
+    max-width: 100px;
+}
+
+.hjow_xcard_style_place .table_each_player_result .i_name {
+    width: 100%;
+}
+
+.hjow_xcard_style_place .table_each_player_result .i_type {
+    width: 70px;
+}
+
+.hjow_xcard_style_place .table_each_player_result .i_affects {
+    width: 100%;
+}
+
+.hjow_xcard_style_place .toolbar {
+    width: 100%;
+    max-height: 22px;
+    background-color: aliceblue;
+    text-align: center;
+    padding: 0;
+}
+
+.hjow_xcard_style_place .toolbar .toolbar_element {
+    display:inline-block;
+}
+
+.hjow_xcard_style_place .toolbar .toolbar_element.left {
+    float: left;
+}
+
+.hjow_xcard_style_place .toolbar .toolbar_element.right {
+    float: right;
+}
+
+.hjow_xcard_style_place .toolbar button {
+    font-size: 10px;
+    max-height: 15px;
+}
+
+.hjow_xcard_style_place .toolbar span {
+    margin: 0;
+    font-size: 10px;
+}
+
+.hjow_xcard_style_place .replay_result {
+    width: 100%;
+    height: 100px;
+    max-height: 100px;
+    display: none;
+}
+
+.hjow_xcard_style_place .replay_json {
+    width: 100%;
+    height: 100%;
+}
+
+.hjow_xcard_style_place .div_player_ai_custom {
+    padding: 5px 5px 5px 5px;
+    height: 100%;
+}
+
+.hjow_xcard_style_place .div_player_ai_custom_element {
+    display: inline-block;
+    width: 150px;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.hjow_xcard_style_place .div_player_ai_custom_element.wide {
+    width: 200px;
+}
+
+.hjow_xcard_style_place .div_player_ai_custom_element span, .hjow_xcard_style_place .div_player_ai_custom_element select, .hjow_xcard_style_place .div_player_ai_custom_element textarea {
+    vertical-align: middle;
+}
+
+.hjow_xcard_style_place .page_main .td_player td {
+    padding: 5px 5px 5px 5px;
+}
+
+.hjow_xcard_style_place .tx_ai_script {
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+}
+
+.hjow_xcard_style_place .page_main td.td_player_list table.player_list td.player_info_basic_label {
+    width: 100px;
+    min-width: 70px;
+}
+
+.hjow_xcard_style_place .page_main td.td_player_list table.player_list td.player_info_basic {
+    width: 200px;
+    min-width: 200px;
+}
+
+.hjow_xcard_style_place .advanceMode {
+    display: none;
+}
+
+.hjow_xcard_style_place .setting_list {
+    overflow-y: auto;
+}
+
+.hjow_xcard_style_place .setting_element {
+    padding: 5px 5px 5px 5px;
+    border: 1px solid lightgray;
+}
+
+.hjow_xcard_style_place .setting_element p, .hjow_xcard_style_place .setting_element pre {
+    font-size: 11px;
+}
+
+.hjow_xcard_style_place .setting_element.setting_buttons_bottom {
+    border: 0;
+}
+
+.hjow_xcard_style_place .div_game_mode_desc {
+    padding: 5px 5px 5px 5px;
+    font-size: 11px;
+}
+
+.hjow_xcard_style_place .tx_theme_script {
+    width: 100%;
+    min-height: 100px;
+    height: 120px;
+}
+
+.hjow_xcard_style_place .finish_result {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
+.hjow_xcard_style_place .finish_result.lb_finish_result {
+    font-weight: normal;
+}

@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Package IgnorableNamespaces="uap mp" xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10">
+    <Identity Name="hjow.game.xcard" Publisher="CN=$username$" Version="0.0.1.0" />
+    <mp:PhoneIdentity PhoneProductId="31776020-10db-11e9-ab1b-fd8f6d0eab33" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+    <Properties>
+        <DisplayName>X Card</DisplayName>
+        <PublisherDisplayName>HJOW</PublisherDisplayName>
+        <Logo>images\StoreLogo.png</Logo>
+        <Description>X Card 는 턴제 카드 게임입니다. 카드에는 숫자와 기호가 하나씩 부여되어 있습니다. -1 에서 10 사이의 숫자와 +, -, × 3가지 기호로 이루어진 33 종류의 카드를 사용한 게임입니다.</Description>
+    </Properties>
+    <Dependencies>
+        <TargetDeviceFamily MaxVersionTested="10.0.10240.0" MinVersion="10.0.10240.0" Name="Windows.Universal" />
+    </Dependencies>
+    <Resources>
+        <Resource Language="x-generate" />
+    </Resources>
+    <Applications>
+        <Application Id="hjow.game.xcard" StartPage="ms-appx-web://hjow.game.xcard/www/index.html">
+            <uap:VisualElements BackgroundColor="#464646" Description="X Card 는 턴제 카드 게임입니다. 카드에는 숫자와 기호가 하나씩 부여되어 있습니다. -1 에서 10 사이의 숫자와 +, -, × 3가지 기호로 이루어진 33 종류의 카드를 사용한 게임입니다." DisplayName="X Card" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
+                <uap:SplashScreen Image="images\splashscreen.png" />
+                <uap:DefaultTile ShortName="X Card" Square310x310Logo="images\Square310x310Logo.png" Square71x71Logo="images\Square71x71Logo.png" Wide310x150Logo="images\Wide310x150Logo.png" />
+                <uap:InitialRotationPreference>
+                    <uap:Rotation Preference="portrait" />
+                    <uap:Rotation Preference="landscape" />
+                    <uap:Rotation Preference="landscapeFlipped" />
+                </uap:InitialRotationPreference>
+            </uap:VisualElements>
+            <uap:ApplicationContentUriRules>
+                <uap:Rule Match="ms-appx-web:///" Type="include" WindowsRuntimeAccess="all" />
+            </uap:ApplicationContentUriRules>
+        </Application>
+    </Applications>
+    <Capabilities>
+        <Capability Name="internetClient" />
+    </Capabilities>
+</Package>

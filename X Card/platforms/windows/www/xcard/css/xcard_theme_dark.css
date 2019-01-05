@@ -1,0 +1,62 @@
+﻿
+/*
+This CSS file is made by HJOW.
+E-mail : hujinone22@naver.com
+
+This css file need following libraries : jQuery UI, hjow_common.
+
+jQuery UI : https://jqueryui.com/
+
+
+*/
+/*
+Copyright 2018 HJOW (hujinone22@naver.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+body {
+    background-color: black;
+    color: gray;
+}
+
+.hjow_xcard_style_place button {
+    border: 0;
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 1px solid gray;
+    color: lightgray;
+}
+
+.hjow_xcard_style_place button.disabled {
+    background-color: black;
+    color: gray;
+}
+
+.hjow_xcard_style_place .toolbar {
+    background-color: black;
+    color: white;
+    border: 1px solid gray;
+    padding: 2px 2px 2px 2px;
+}
+
+.hjow_xcard_style_place select, .hjow_xcard_style_place textarea, .hjow_xcard_style_place input {
+    background-color: rgba(60, 60, 60, 0.9);
+    border: 1px solid gray;
+    color: lightgray;
+}
+
+.hjow_xcard_style_place select.disabled, .hjow_xcard_style_place textarea.disabled, .hjow_xcard_style_place input.disabled {
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 1px solid rgba(60, 60, 60, 0.9);
+    color: rgba(60, 60, 60, 0.9);
+}

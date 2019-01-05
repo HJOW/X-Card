@@ -12,7 +12,8 @@
     "cordova-plugin-whitelist": "1.2.2",
     "cordova-windows": "~4.4.2",
     "es6-promise-plugin": "^4.2.2",
-    "jquery": "^3.1.1"
+    "jquery": "^3.1.1",
+    "cordova-plugin-inappbrowser": "~3.0.0"
   },
   "devDependencies": {
     "@types/jquery": "2.0.47"
@@ -29,7 +30,8 @@
       "cordova-plugin-console": {},
       "cordova-plugin-device": {},
       "cordova-plugin-network-information": {},
-      "cordova-plugin-screen-orientation": {}
+      "cordova-plugin-screen-orientation": {},
+      "cordova-plugin-inappbrowser": {}
     }
   }
 }

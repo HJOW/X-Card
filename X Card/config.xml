@@ -100,11 +100,11 @@
     <preference name="deployment-target" value="0" />
     <preference name="BackupWebStorage" value="cloud" />
     <preference name="Fullscreen" value="False" />
-    <engine name="browser" spec="~5.0.4" />
     <plugin name="cordova-plugin-inappbrowser" spec="~3.0.0" />
     <vs:toolsetVersion>6.3.1</vs:toolsetVersion>
-    <engine name="android" spec="5.2.1" />
-    <engine name="ios" spec="4.2.0" />
-    <engine name="windows" spec="4.4.2" />
     <plugin name="cordova-plugin-screen-orientation" spec="^3.0.1" />
+    <engine name="ios" spec="~4.2.0" />
+    <engine name="windows" spec="~4.4.2" />
+    <engine name="browser" spec="^5.0.4" />
+    <engine name="android" spec="^7.1.4" />
 </widget>
