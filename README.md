@@ -2,11 +2,14 @@
 
 ## 테스트 버전 플레이
 
-http://netstorm.woobi.co.kr/xcalc/xcard.html 에 방문해 주세요.
+http://netstorm.woobi.co.kr/xcard/ 에 방문해 주세요.
 지원하는 웹 브라우저
   Google Chrome (60 이상)
   Mozilla Firefox (52 이상)
   Microsoft Edge (Windows 10 빌드 1803 내장 버전 이상)
+  
+또는 안드로이드 알파 버전을 플레이해 보세요.
+https://github.com/HJOW/X-Card/edit/master/release/xcard_20190106_0230.apk
   
 
 ## 이 프로젝트는? (What is this project?)
