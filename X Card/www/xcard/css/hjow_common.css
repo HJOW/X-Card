@@ -35,7 +35,7 @@ div.page, table.full, td.full, button.full {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 
 .min_size, .layout {
@@ -118,4 +118,49 @@ div.page, table.full, td.full, button.full {
 
 .selalter_option.selected {
     background-color: cyan;
+}
+
+input {
+    -webkit-user-select: none;
+}
+
+.hjow_virtual_keyboard_dialog.hidden {
+    display: none;
+}
+
+.hjow_dialog_virtual {
+    overflow: hidden;
+}
+
+td.key_1_1 {
+    width: 16px;
+    height: 22px;
+}
+
+td.key_2_1 {
+    width: 26px;
+    height: 22px;
+}
+
+td.key_1_2 {
+    width: 16px;
+    height: 42px;
+}
+
+td.key_2_2 {
+    width: 26px;
+    height: 42px;
+}
+
+button.hjow_virtual_keyboard_key {
+    width: 100%;
+    height:100%;
+}
+
+.hjow_virtual_keyboard_show {
+    width: 100%;
+}
+
+textarea.hjow_virtual_keyboard_show {
+    height: 50px;
 }

@@ -605,42 +605,46 @@ function hjow_tryExit() {
 h.tryExit = hjow_tryExit;
 
 function hjow_select_init(selectObj) {
-    var selObj = $(selectObj);
-    var randomNo = selObj.attr('selalt');
-    if (!(randomNo == null || typeof (randomNo) == 'undefined' || randomNo == '')) {
-        var altObj = $('.selalter.div_' + randomNo);
-        altObj.find('.selalter_option').off('click');
-        altObj.remove();
-        selObj.removeClass('sel_' + randomNo);
-    }
-    var parent = selObj.parent();
-    randomNo = String(Math.round(Math.random() * 999999999));
-    randomNo = randomNo + String(Math.round(Math.random() * 999999999));
-    selObj.addClass('hidden');
-    selObj.addClass('sel_' + randomNo);
-    selObj.attr('selalt', randomNo);
-    var newSelTags = "<div class='selalter div_" + randomNo + "' selalt='" + randomNo + "'></div>";
-    parent.append(newSelTags);
-    hjow_select_sync(selectObj);
+    $(selectObj).each(function () {
+        var selObj = $(this);
+        var randomNo = selObj.attr('data-selalt');
+        if (!(randomNo == null || typeof (randomNo) == 'undefined' || randomNo == '')) {
+            var altObj = $('.selalter.div_' + randomNo);
+            altObj.find('.selalter_option').off('click');
+            altObj.remove();
+            selObj.removeClass('sel_' + randomNo);
+        }
+        var parent = selObj.parent();
+        randomNo = String(Math.round(Math.random() * 999999999));
+        randomNo = randomNo + String(Math.round(Math.random() * 999999999));
+        selObj.addClass('hidden');
+        selObj.addClass('sel_' + randomNo);
+        selObj.attr('data-selalt', randomNo);
+        var newSelTags = "<div class='selalter div_" + randomNo + "' data-selalt='" + randomNo + "'></div>";
+        parent.append(newSelTags);
+        hjow_select_sync(selectObj);
+    });
 };
 
 h.select_init = hjow_select_init;
 
 function hjow_select_sync(selectObj) {
-    var jqObj = $(selectObj);
-    var randomNo = jqObj.attr('selalt');
-    var selObj = $('.sel_' + randomNo);
-    var altObj = $('.div_' + randomNo);
-    altObj.find('.selalter_option').off('click');
-    altObj.find('.selalter_option').remove();
-    var options = selObj.find('option');
-    options.each(function () {
-        var addiClass = '';
-        var valueOf = $(this).attr('value');
-        if (valueOf == selObj.val()) addiClass = addiClass + ' selected';
-        if ($(this).is('.concealed')) addiClass = addiClass + ' concealed';
-        if ($(this).is('.hidden')) addiClass = addiClass + ' hidden';
-        altObj.append("<div class='selalter_option opt_" + randomNo + addiClass + "' value=\"" + hjow_serializeString(valueOf) + "\" onclick=\"hjow_select_onClick('" + randomNo + "', '" + hjow_serializeString(valueOf) + "', this); return false;\">" + hjow_serializeXMLString($(this).text()) + "</div>");
+    $(selectObj).each(function () {
+        var jqObj = $(this);
+        var randomNo = jqObj.attr('data-selalt');
+        var selObj = $('.sel_' + randomNo);
+        var altObj = $('.div_' + randomNo);
+        altObj.find('.selalter_option').off('click');
+        altObj.find('.selalter_option').remove();
+        var options = selObj.find('option');
+        options.each(function () {
+            var addiClass = '';
+            var valueOf = $(this).attr('value');
+            if (valueOf == selObj.val()) addiClass = addiClass + ' selected';
+            if ($(this).is('.concealed')) addiClass = addiClass + ' concealed';
+            if ($(this).is('.hidden')) addiClass = addiClass + ' hidden';
+            altObj.append("<div class='selalter_option opt_" + randomNo + addiClass + "' data-value=\"" + hjow_serializeString(valueOf) + "\" onclick=\"hjow_select_onClick('" + randomNo + "', '" + hjow_serializeString(valueOf) + "', this); return false;\">" + hjow_serializeXMLString($(this).text()) + "</div>");
+        });
     });
 };
 
@@ -656,6 +660,369 @@ function hjow_select_onClick(randomNo, value, selAlterObj) {
 };
 
 h.select_onClick = hjow_select_onClick;
+
+h.selectfunc = {
+    init: h.select_init,
+    sync: h.select_sync
+};
+
+function hjow_input_init(inpObj) {
+    var virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+    if (virtualKeyboardDialogObj.length <= 0) {
+        $('body').append("<div class='hjow_virtual_keyboard_dialog hidden hjow_dialog_virtual' title='Keyboard' data-targetcomp-id='' data-locale='enb'></div>");
+    }
+    $(inpObj).each(function () {
+        var inputObj = $(this);
+        if (!(inputObj.is('input') || inputObj.is('textarea'))) return;
+        var randomNo = inputObj.attr('data-targetcomp-id');
+        if (randomNo == null || typeof (randomNo) == 'undefined' || randomNo == '') {
+            randomNo = String(Math.round(Math.random() * 999999999));
+            randomNo = randomNo + String(Math.round(Math.random() * 999999999));
+            inputObj.attr('data-targetcomp-id', randomNo);
+            inputObj.addClass('hjow_virtual_keyboard_target');
+            inputObj.on('click', function () {
+                hjow_input_onClick(this);
+            });
+        }
+    });
+};
+
+h.input_init = hjow_input_init;
+
+function hjow_input_getKeyboardHTML(locale, isMultiLine) { // locale : enb(대문자), ens(소문자), spc(특수문자) - 한글은 조합 언어라 이 방식으로 불가능
+    var result = '';
+    result = result + "<table class='hjow_virtual_keyboard_table'>";
+    result = result + "   <tr>";
+    result = result + "      <td colspan='14'>";
+    if (isMultiLine)
+        result = result + "         <textarea class='hjow_virtual_keyboard_show' readonly></textarea>";
+    else
+        result = result + "         <input type='text' class='hjow_virtual_keyboard_show' readonly/>";
+    result = result + "      </td>";
+    result = result + "   </tr>";
+    result = result + "<tr>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('`', '`') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('1', '1') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('2', '2') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('3', '3') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('4', '4') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('5', '5') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('6', '6') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('7', '7') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('8', '8') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('9', '9') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('0', '0') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('-', '-') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('=', '=') + "</td>";
+    result = result + "   <td rowspan='2' class='key_1_2'>" + hjow_input_getKeyHTML('←', 'backspace') + "</td>"; // 14
+    result = result + "</tr>";
+    result = result + "<tr>";
+    // rowspan affect 1
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('~', '~') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('!', '!') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('@', '@') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('#', '#') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('$', '$') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('%', '%') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('^', '^') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('&', '&') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('*', '*') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('(', '(') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(')', ')') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('_', '_') + "</td>";
+    result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('+', '+') + "</td>"; // 13 + 1(rowspan)
+    result = result + "</tr>";
+    if (locale == 'enb') {
+        result = result + "<tr>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('Tab', '\t') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('Q', 'Q') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('W', 'W') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('E', 'E') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('R', 'R') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('T', 'T') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('Y', 'Y') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('U', 'U') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('I', 'I') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('O', 'O') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('P', 'P') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('{', '{') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('}', '}') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('|', '|') + "</td>"; // 14
+        result = result + "</tr>";
+        result = result + "<tr>";
+        result = result + "   <td rowspan='2' class='key_1_2'>" + hjow_input_getKeyHTML('CHG', 'changelanguage') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('A', 'A') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('S', 'S') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('D', 'D') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('F', 'F') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('G', 'G') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('H', 'H') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('J', 'J') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('K', 'K') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('L', 'L') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(':', ':') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML("\"", "\"") + "</td>";
+        if (isMultiLine)
+            result = result + "   <td colspan='2' rowspan='2' class='key_2_2'>" + hjow_input_getKeyHTML('Enter', 'enter') + "</td>";
+        else
+            result = result + "   <td colspan='2' rowspan='2' class='key_2_2'></td>";
+        // 13 + 1
+        result = result + "</tr>";
+        result = result + "<tr>";
+        // rowspan affet 1
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('Z', 'Z') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('X', 'X') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('C', 'C') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('V', 'V') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('B', 'B') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('N', 'N') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('M', 'M') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(hjow_serializeXMLString('<'), hjow_serializeXMLString('<')) + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(hjow_serializeXMLString('>'), hjow_serializeXMLString('>')) + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('?', '?') + "</td>";
+        result = result + "   <td></td>";
+        // rowspan affet 1 // 11 + 1 + 2
+        result = result + "</tr>";
+        result = result + "<tr>";
+        result = result + "   <td colspan='14'>" + hjow_input_getKeyHTML('Space', ' ') + "</td>";
+        result = result + "</tr>";
+    } else if (locale == 'ens') {
+        result = result + "<tr>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('Tab', '\t') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('q', 'q') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('w', 'w') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('e', 'e') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('r', 'r') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('t', 't') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('y', 'y') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('u', 'u') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('i', 'i') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('o', 'o') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('p', 'p') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('[', '[') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(']', ']') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('\\', '\\') + "</td>"; // 14
+        result = result + "</tr>";
+        result = result + "<tr>";
+        result = result + "   <td rowspan='2' class='key_1_2'>" + hjow_input_getKeyHTML('CHG', 'changelanguage') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('a', 'a') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('s', 's') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('d', 'd') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('f', 'f') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('g', 'g') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('h', 'h') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('j', 'j') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('k', 'k') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('l', 'l') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(';', ';') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('\'', '\'') + "</td>";
+        if (isMultiLine)
+            result = result + "   <td colspan='2' rowspan='2' class='key_2_2'>" + hjow_input_getKeyHTML('Enter', 'enter') + "</td>";
+        else
+            result = result + "   <td colspan='2' rowspan='2' class='key_2_2'></td>";
+        // 13 + 1
+        result = result + "</tr>";
+        result = result + "<tr>";
+        // rowspan affet 1
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('z', 'z') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('x', 'x') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('c', 'c') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('v', 'v') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('b', 'b') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('n', 'n') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('m', 'm') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML(',', ',') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('.', '.') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('/', '/') + "</td>";
+        result = result + "   <td></td>";
+        // rowspan affet 1 // 11 + 1 + 2
+        result = result + "</tr>";
+        result = result + "<tr>";
+        result = result + "   <td colspan='14'>" + hjow_input_getKeyHTML('Space', ' ') + "</td>";
+        result = result + "</tr>";
+    } else if (locale == 'spc') {
+        result = result + "<tr>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('Tab', '\t') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('§', '§') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('※', '※') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('☆', '☆') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('★', '★') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('○', '○') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('●', '●') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('◎', '◎') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('◇', '◇') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('◆', '◆') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('□', '□') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('■', '■') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('△', '△') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('▲', '▲') + "</td>"; // 14
+        result = result + "</tr>";
+        result = result + "<tr>";
+        result = result + "   <td rowspan='2' class='key_1_2'>" + hjow_input_getKeyHTML('CHG', 'changelanguage') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('▽', '▽') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('▼', '▼') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('♤', '♤') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('♡', '♡') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('♧', '♧') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('♨', '♨') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('☏', '☏') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('☜', '☜') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('☞', '☞') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('♪', '♪') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('\'', '\'') + "</td>";
+        if (isMultiLine)
+            result = result + "   <td colspan='2' rowspan='2' class='key_2_2'>" + hjow_input_getKeyHTML('Enter', 'enter') + "</td>";
+        else
+            result = result + "   <td colspan='2' rowspan='2' class='key_2_2'></td>";
+        // 13 + 1
+        result = result + "</tr>";
+        result = result + "<tr>";
+        // rowspan affet 1
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('＋', '＋') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('－', '－') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('×', '×') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('÷', '÷') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('±', '±') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('≠', '≠') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('≤', '≤') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('≥', '≥') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('∞', '∞') + "</td>";
+        result = result + "   <td class='key_1_1'>" + hjow_input_getKeyHTML('/', '/') + "</td>";
+        result = result + "   <td></td>";
+        // rowspan affet 1 // 11 + 1 + 2
+        result = result + "</tr>";
+        result = result + "<tr>";
+        result = result + "   <td colspan='14'>" + hjow_input_getKeyHTML('Space', ' ') + "</td>";
+        result = result + "</tr>";
+    }
+    
+    result = result + "</table>";
+    return result;
+};
+
+h.input_getKeyboardHTML = hjow_input_getKeyboardHTML;
+
+function hjow_input_getKeyHTML(keyDisp, keyVal) {
+    return "<button type='button' class='hjow_virtual_keyboard_key' data-value='" + keyVal + "' onclick=\"hjow_input_onClickKey(this); return false;\">" + keyDisp + "</button>";
+};
+
+h.input_getKeyHTML = hjow_input_getKeyHTML;
+
+function hjow_input_onClickKey(btnObj) {
+    var buttonObj = $(btnObj);
+    var value = buttonObj.attr('data-value');
+    var randomNo = buttonObj.parents('div.hjow_virtual_keyboard_dialog').attr('data-targetcomp-id');
+    var targetComp = null;
+    $('.hjow_virtual_keyboard_target').each(function () {
+        if (targetComp != null) return;
+        var compOne = $(this);
+        if (compOne.attr('data-targetcomp-id') == randomNo) {
+            targetComp = compOne;
+        }
+    });
+    if (targetComp == null) return;
+    var beforeVal = targetComp.val();
+    var inputVal = buttonObj.attr('data-value');
+    var newVal = null;
+    if (inputVal == hjow_serializeXMLString('<')) inputVal = '<';
+    else if (inputVal == hjow_serializeXMLString('>')) inputVal = '>';
+    if (inputVal == 'backspace') {
+        newVal = beforeVal.substring(0, beforeVal.length - 1);
+        targetComp.val(newVal);
+        $('.hjow_virtual_keyboard_table .hjow_virtual_keyboard_show').val(newVal + '|');
+    } else if (inputVal == 'enter') {
+        newVal = beforeVal + '\n';
+        targetComp.val(newVal);
+        $('.hjow_virtual_keyboard_table .hjow_virtual_keyboard_show').val(newVal + '|');
+    } else if (inputVal == 'changelanguage') {
+        var virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+        var locale = virtualKeyboardDialogObj.attr('data-locale');
+        if (locale == 'enb') locale = 'ens';
+        else if (locale == 'ens') locale = 'spc';
+        else if (locale == 'spc') locale = 'enb';
+        else locale = 'enb';
+        virtualKeyboardDialogObj.attr('data-locale', locale);
+        hjow_input_refreshKeyboardSet();
+    } else {
+        newVal = beforeVal + inputVal;
+        targetComp.val(newVal);
+        $('.hjow_virtual_keyboard_table .hjow_virtual_keyboard_show').val(newVal + '|');
+    }
+};
+
+h.input_onClickKey = hjow_input_onClickKey;
+
+function hjow_input_refreshKeyboardSet() {
+    var virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+    if (virtualKeyboardDialogObj.length <= 0) {
+        $('body').append("<div class='hjow_virtual_keyboard_dialog hidden hjow_dialog_virtual' title='Keyboard' data-targetcomp-id='' data-locale='enb'></div>");
+        virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+    }
+    var keyboardLocale = virtualKeyboardDialogObj.attr('data-locale');
+    if (keyboardLocale == null || typeof (keyboardLocale) == 'undefined') keyboardLocale = 'enb';
+
+    var isMultiLine = false;
+    var randomNo = virtualKeyboardDialogObj.attr('data-targetcomp-id');
+    var targetComp = null;
+    if (randomNo != null && randomNo != '') {
+        $('.hjow_virtual_keyboard_target').each(function () {
+            var compOne = $(this);
+            if (compOne.attr('data-targetcomp-id') == randomNo) {
+                targetComp = compOne;
+            }
+        });
+        if (targetComp != null) {
+            if (targetComp.is('textarea')) isMultiLine = true;
+        }
+    }
+    
+    virtualKeyboardDialogObj.html(hjow_input_getKeyboardHTML(keyboardLocale, isMultiLine));
+    if (targetComp != null) {
+        virtualKeyboardDialogObj.find('.hjow_virtual_keyboard_show').val(targetComp.val() + '|');
+    }
+};
+
+h.input_refreshKeyboardSet = hjow_input_refreshKeyboardSet;
+
+function hjow_input_onClick(inpObj) {
+    var inputObj = $(inpObj);
+    var virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+    if (virtualKeyboardDialogObj.length <= 0) {
+        $('body').append("<div class='hjow_virtual_keyboard_dialog hidden hjow_dialog_virtual' title='Keyboard' data-targetcomp-id='' data-locale='enb'></div>");
+        virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+    }
+    virtualKeyboardDialogObj.attr('data-targetcomp-id', inputObj.attr('data-targetcomp-id'));
+    hjow_input_refreshKeyboardSet();
+    virtualKeyboardDialogObj.find('.hjow_virtual_keyboard_show').val(inputObj.val() + '|');
+    virtualKeyboardDialogObj.dialog({
+        width: 560,
+        height: 320
+    });
+};
+
+h.input_onClick = hjow_input_onClick;
+
+function hjow_input_close() {
+    var virtualKeyboardDialogObj = $('div.hjow_virtual_keyboard_dialog');
+    if (virtualKeyboardDialogObj.length <= 0) return;
+    try {
+        if (virtualKeyboardDialogObj.dialog('isOpen')) {
+            virtualKeyboardDialogObj.dialog('close');
+        }
+    } catch (e) { }
+};
+
+h.input_close = hjow_input_close;
+
+h.inputfunc = {
+    init : h.input_init,
+    getKeyboardHTML: h.input_getKeyboardHTML,
+    getKeyHTML: h.input_getKeyHTML,
+    onClickKey: h.input_onClickKey,
+    refreshKeyboardSet: h.input_refreshKeyboardSet,
+    onClick: h.input_onClick,
+    close: h.input_close
+};
 
 function hjow_runAfter(actFunc, timemills) {
     var tempTimer = setTimeout(function () {

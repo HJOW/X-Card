@@ -259,7 +259,7 @@ class LanguageSet extends UtilityMethods {
     public translate(target: string): string {
         var results: string = this.stringTable.get(target);
         if (results == null) {
-            hjow_log(target);
+            if (this.localeAlt != 'en-US') hjow_log(target);
             return target;
         }   
         return results;
@@ -1647,7 +1647,7 @@ class XCardGameTutorial extends XCardGameSpeedMode {
 };
 
 class XCardGameEngine extends ModuleObject {
-    private version: string = "0.0.1";
+    private version: string = "0.0.2";
     private placeArea: string = null;
 
     private gameModeList: XCardGameMode[] = [];
@@ -1684,6 +1684,8 @@ class XCardGameEngine extends ModuleObject {
         this.placeArea = String(plcArea);
         hjow_prepareJQuery();
         jq(plcArea).addClass('hjow_xcard_style_place');
+        jq(plcArea).css('overflow-x', 'hidden');
+        jq(plcArea).css('overflow-y', 'auto');
         this.debugMode = debugMode;
         if (debugMode) {
             hjow_putEngine(this);
@@ -1725,6 +1727,7 @@ class XCardGameEngine extends ModuleObject {
         // this.gameModeList.push(new XCardGameTutorial());
 
         var useBrowserSelectOpt = this.getProperty('use_browser_select');
+        var useBrowserInputOpt = this.getProperty('use_browser_input');
         var screenApplySpeed = this.getProperty('screen_apply_speed');
         if (useBrowserSelectOpt == null || typeof (useBrowserSelectOpt) == 'undefined' || useBrowserSelectOpt == '') {
             if (hjow_getPlatform() == 'android') {
@@ -1735,8 +1738,18 @@ class XCardGameEngine extends ModuleObject {
             this.setProperty('use_browser_select', useBrowserSelectOpt);
         }
 
+        if (useBrowserInputOpt == null || typeof (useBrowserInputOpt) == 'undefined' || useBrowserInputOpt == '') {
+            if (hjow_getPlatform() == 'android') {
+                useBrowserInputOpt = "false";
+            } else {
+                useBrowserInputOpt = "true";
+            }
+            this.setProperty('use_browser_input', useBrowserInputOpt);
+        }
+        
         if (screenApplySpeed == null || typeof (screenApplySpeed) == 'undefined' || screenApplySpeed == '') {
             screenApplySpeed = "300";
+            if (hjow_parseBoolean(useBrowserSelectOpt)) screenApplySpeed = "100";
             this.setProperty('screen_apply_speed', screenApplySpeed);
         }
     };
@@ -1758,6 +1771,7 @@ class XCardGameEngine extends ModuleObject {
         } else {
             jq(this.placeArea).find('.advanceMode').hide();
         }
+        this.prepareHowToPlayDialog();
     };
     public getPlaceArea() {
         return jq(this.placeArea);
@@ -2196,6 +2210,11 @@ class XCardGameEngine extends ModuleObject {
         if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser') {
             jq(this.placeArea).find('.selalter_option').off('click');
         }
+        var inHeight = window.innerHeight - 20;
+        if (jq(this.placeArea).is('.auto_size')) {
+            jq(this.placeArea).height(inHeight);
+            jq('body').css('height', 'auto');
+        }
         if (heavyRefresh) {
             jq(this.placeArea).find('.page_game').html(hjow_toStaticHTML(this.gamePageHTML()));
             jq(this.placeArea).find('.page_main').html(hjow_toStaticHTML(this.mainPageHTML()));
@@ -2203,8 +2222,15 @@ class XCardGameEngine extends ModuleObject {
             jq(this.placeArea).find('.page_set').html(hjow_toStaticHTML(this.setPageHTML()));
             // jq(this.placeArea).find('.page_result').html(this.resultPageHTML()); // 아래쪽에서 처리
             this.prepareEvents();
+            hjow_input_close();
         }
-        jq(this.placeArea).find('.toolbar').html(hjow_toStaticHTML(this.toolbarHTML())); // 툴바는 항상 재로드
+        var toolbarArea = jq(this.placeArea).find('.toolbar');
+        toolbarArea.html(hjow_toStaticHTML(this.toolbarHTML())); // 툴바는 항상 재로드
+        if (jq(this.placeArea).is('.auto_size')) {
+            var toolbarHeight = toolbarArea.height();
+            if (toolbarHeight <= 22) toolbarArea = 22;
+            jq(this.placeArea).find('div.page').height(inHeight - (toolbarHeight + 10));
+        }
         if (this.needHideScreen) {
             jq(this.placeArea).find('.page:not(.page_hide)').hide();
             this.refreshGame();
@@ -2239,6 +2265,9 @@ class XCardGameEngine extends ModuleObject {
         if (this.showSettings && this.debugMode) {
             this.refreshSettingPage();
             jq(this.placeArea).find('.page_set').show();
+        }
+        if (!hjow_parseBoolean(this.getProperty('use_browser_input'))) {
+            hjow_input_init('.need_custom_keyboard');
         }
     };
     private refreshMain() {
@@ -2278,7 +2307,7 @@ class XCardGameEngine extends ModuleObject {
         results += "       </td>" + "\n";
         results += "   </tr>" + "\n";
         results += "   <tr class='tr_player_empty element e144'>" + "\n";
-        results += "      <td class='td_player_empty full element e145'>" + "\n";
+        results += "      <td class='td_player_empty element e145'>" + "\n";
         results += "      </td>" + "\n";
         results += "   </tr>" + "\n";
         results += "</table>" + "\n";
@@ -2292,7 +2321,7 @@ class XCardGameEngine extends ModuleObject {
             removeBtn.addClass('disabled');
         }
 
-        var heightVal: number = jq(this.placeArea).height(); // window.innerHeight;
+        var heightVal: number = jq(this.placeArea).height() - 20;
         if (heightVal < 200) heightVal = 200;
 
         this.initTheme(1, false);
@@ -2526,10 +2555,10 @@ class XCardGameEngine extends ModuleObject {
 
         var selfObj = this;
         hjow_runAfter(function () {
-            var heightVal: number = jq(selfObj.placeArea).height(); // window.innerHeight;
+            var heightVal: number = jq(selfObj.placeArea).height() - 20; // window.innerHeight;
             if (heightVal < 500) heightVal = 500;
 
-            var widthVal: number = jq(selfObj.placeArea).width(); // window.innerWidth;
+            var widthVal: number = jq(selfObj.placeArea).width() - 10; // window.innerWidth;
             if (widthVal < 700) widthVal = 700;
 
             jq(selfObj.placeArea).find('.player_arena_div').css('min-height', heightVal - 200 + 'px');
@@ -2618,6 +2647,30 @@ class XCardGameEngine extends ModuleObject {
             useAdvanComp.removeProp('checked');
         }
 
+        var virtualSelectOpt: string = this.getProperty('use_browser_select');
+        if (virtualSelectOpt == null) virtualSelectOpt = 'false';
+
+        var virtualSelectComp = settingPage.find('.chk_use_virtual_select');
+        if (!hjow_parseBoolean(virtualSelectOpt)) {
+            virtualSelectComp.attr('checked', 'checked');
+            virtualSelectComp.prop('checked', true);
+        } else {
+            virtualSelectComp.removeAttr('checked');
+            virtualSelectComp.removeProp('checked');
+        }
+
+        var virtualKeyboardOpt: string = this.getProperty('use_browser_input');
+        if (virtualKeyboardOpt == null) virtualKeyboardOpt = 'false';
+
+        var virtualKeyboardComp = settingPage.find('.chk_use_virtual_keyboard');
+        if (!hjow_parseBoolean(virtualKeyboardOpt)) {
+            virtualKeyboardComp.attr('checked', 'checked');
+            virtualKeyboardComp.prop('checked', true);
+        } else {
+            virtualKeyboardComp.removeAttr('checked');
+            virtualKeyboardComp.removeProp('checked');
+        }
+
         var customLocaleOpt = this.getProperty('locale');
         if (customLocaleOpt == null || customLocaleOpt == '') customLocaleOpt = hjow_selectedLocale;
         if (hjow_selectedLocale == null || typeof (hjow_selectedLocale) == 'undefined') {
@@ -2701,11 +2754,31 @@ class XCardGameEngine extends ModuleObject {
         results += "</div>" + "\n";
         results += "<div class='element e016 setting_element'>" + "\n";
         results += "   <p class='element e017'>" + "\n";
-        results += "      <input type='checkbox' class='element e018 chk_record_replay'/><span class='label'>" + hjow_serializeXMLString(hjow_trans("Record playing data")) + "</span>" + "\n";
+        results += "      <input type='checkbox' class='element e018 chk_record_replay'/><span class='label element e159'>" + hjow_serializeXMLString(hjow_trans("Record playing data")) + "</span>" + "\n";
         results += "   </p>" + "\n";
         results += "   <p class='element e019'>" + "\n";
         results += "      <pre class='element e020'>" + "\n";
         results += hjow_serializeXMLString(hjow_trans("Trying to record playing data includes all progress in the game.")) + "\n";
+        results += "      </pre>" + "\n";
+        results += "   </p>" + "\n";
+        results += "</div>" + "\n";
+        results += "<div class='element e149 setting_element'>" + "\n";
+        results += "   <p class='element e150'>" + "\n";
+        results += "      <input type='checkbox' class='element e151 chk_use_virtual_select'/><span class='label element e160'>" + hjow_serializeXMLString(hjow_trans("Use virtual select box")) + "</span>" + "\n";
+        results += "   </p>" + "\n";
+        results += "   <p class='element e152'>" + "\n";
+        results += "      <pre class='element e153'>" + "\n";
+        results += hjow_serializeXMLString(hjow_trans("Use virtual select box.")) + "\n";
+        results += "      </pre>" + "\n";
+        results += "   </p>" + "\n";
+        results += "</div>" + "\n";
+        results += "<div class='element e154 setting_element'>" + "\n";
+        results += "   <p class='element e155'>" + "\n";
+        results += "      <input type='checkbox' class='element e156 chk_use_virtual_keyboard'/><span class='label element e161'>" + hjow_serializeXMLString(hjow_trans("Use virtual keyboard")) + "</span>" + "\n";
+        results += "   </p>" + "\n";
+        results += "   <p class='element e157'>" + "\n";
+        results += "      <pre class='element e158'>" + "\n";
+        results += hjow_serializeXMLString(hjow_trans("Use virtual keyboard.")) + "\n";
         results += "      </pre>" + "\n";
         results += "   </p>" + "\n";
         results += "</div>" + "\n";
@@ -2729,13 +2802,13 @@ class XCardGameEngine extends ModuleObject {
         results += hjow_serializeXMLString(hjow_trans("You can paste the styling scripts here.")) + "\n";
         results += "   </p>" + "\n";
         results += "   <p class='element e029'>" + "\n";
-        results += "      <textarea class='element e030 tx_theme_script tx_theme_script_1'></textarea>" + "\n";
+        results += "      <textarea class='element e030 tx_theme_script tx_theme_script_1 need_custom_keyboard'></textarea>" + "\n";
         results += "   </p>" + "\n";
         results += "   <p class='element e031'>" + "\n";
-        results += "      <textarea class='element e032 tx_theme_script tx_theme_script_2'></textarea>" + "\n";
+        results += "      <textarea class='element e032 tx_theme_script tx_theme_script_2 need_custom_keyboard'></textarea>" + "\n";
         results += "   </p>" + "\n";
         results += "</div>" + "\n";
-        results += "<div class='element setting_element scriptTest advanceMode'><input type='text' class='tx_console_run'/><button type='button' class='btn_console_run'>" + hjow_serializeXMLString(hjow_trans("Run")) + "</button></div>\n";
+        results += "<div class='element setting_element scriptTest advanceMode'><input type='text' class='tx_console_run need_custom_keyboard'/><button type='button' class='element btn_console_run need_custom_keyboard'>" + hjow_serializeXMLString(hjow_trans("Run")) + "</button></div>\n";
         results += "</div>" + "\n";
         results += "<div class='element e033 setting_element setting_buttons_bottom'>" + "\n";
         results += "   <p class='element e034'>" + "\n";
@@ -2881,7 +2954,7 @@ class XCardGameEngine extends ModuleObject {
         results += "          <td class='element e095 player_info_basic'>" + "\n";
         var playerNameFieldOpt: string = "";
         if (!player.isNameEditable()) playerNameFieldOpt = " disabled";
-        results += "             <input type='text' class='element e096 inp_pname" + playerNameFieldOpt + "' name='pname_" + hjow_serializeString(player.getUniqueId()) + "' value='" + hjow_serializeString(player.getName()) + "'" + playerNameFieldOpt + "/>" + "\n";
+        results += "             <input type='text' class='element e096 inp_pname need_custom_keyboard" + playerNameFieldOpt + "' name='pname_" + hjow_serializeString(player.getUniqueId()) + "' value='" + hjow_serializeString(player.getName()) + "'" + playerNameFieldOpt + "/>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td rowspan='2' class='element e097'>" + "\n";
         var customHtml = player.customMainHTML();
@@ -2935,7 +3008,7 @@ class XCardGameEngine extends ModuleObject {
             results += "          <span class='element e120 player_inventory_card_count'>0</span> <span class='label'>" + hjow_serializeXMLString(hjow_trans("Cards")) + "</span>";
             results += "      </td>";
             results += "      <td class='element e121 player_arena_one_line_layout'>";
-            results += "          <button type='button' class='element e122 btn_user_control btn_pay_here' x-unique-id=\"" + hjow_serializeString(player.getUniqueId()) + "\">" + hjow_serializeXMLString(hjow_trans("Pay here")) + "</button>";
+            results += "          <button type='button' class='element e122 btn_user_control btn_pay_here' data-unique-id=\"" + hjow_serializeString(player.getUniqueId()) + "\">" + hjow_serializeXMLString(hjow_trans("Pay here")) + "</button>";
             results += "      </td>";
             results += "   </tr>";
             results += "   <tr class='element e123 player_arena_one_line_layout'>";
@@ -3014,6 +3087,20 @@ class XCardGameEngine extends ModuleObject {
             this.setProperty('use_advanced_features', 'true');
         } else {
             this.setProperty('use_advanced_features', 'false');
+        }
+
+        var useVirSel = settingPage.find('.chk_use_virtual_select');
+        if (useVirSel.is(':checked')) {
+            this.setProperty('use_browser_select', 'false');
+        } else {
+            this.setProperty('use_browser_select', 'true');
+        }
+
+        var useVirInp = settingPage.find('.chk_use_virtual_keyboard');
+        if (useVirInp.is(':checked')) {
+            this.setProperty('use_browser_input', 'false');
+        } else {
+            this.setProperty('use_browser_input', 'true');
         }
 
         var localeSel = settingPage.find('.sel_language').val();
@@ -3192,7 +3279,7 @@ class XCardGameEngine extends ModuleObject {
         });
         
         this.reAllocateButtonEvent(pageArea.find('.btn_pay_here'), function (compObj) {
-            selfAny.events.game.btn_pay_here(compObj.attr('x-unique-id'));
+            selfAny.events.game.btn_pay_here(compObj.attr('data-unique-id'));
         });
         
         this.reAllocateButtonEvent(pageArea.find('.btn_stop_game'), function (compObj) {
@@ -3506,6 +3593,10 @@ class XCardGameEngine extends ModuleObject {
         newLangSet.stringTable.set("You can paste the styling scripts here.", "이 곳에 테마 변경용 스크립트(JSON)를 입력할 수 있습니다.");
         newLangSet.stringTable.set("On this platform, local storage saving is not working. Changes will be applied only this time.", "이 플랫폼에서는 로컬 저장소 기능을 사용할 수 없습니다. 설정은 적용되지만 다음 번 실행 시 다시 초기화됩니다.");
         newLangSet.stringTable.set("Some custom player setting is not supported for recording replay.", "사용자 정의 플레이어 세팅으로 인해 리플레이 저장 기능이 동작하지 않습니다.");
+        newLangSet.stringTable.set("Use virtual select box", "가상 리스트박스 사용");
+        newLangSet.stringTable.set("Use virtual select box.", "가상 리스트박스를 사용합니다.");
+        newLangSet.stringTable.set("Use virtual keyboard", "가상 키보드 사용");
+        newLangSet.stringTable.set("Use virtual keyboard.", "가상 키보드를 사용합니다.");
         newLangSet.stringTable.set("The game is preparing to start.", "게임 시작을 준비하고 있습니다.");
         newLangSet.stringTable.set("Game is started.", "게임이 시작되었습니다.");
         newLangSet.stringTable.set("Mode", "모드");
