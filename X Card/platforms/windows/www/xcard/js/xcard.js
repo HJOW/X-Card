@@ -1917,6 +1917,8 @@ var XCardGameTutorial = (function (_super) {
     return XCardGameTutorial;
 }(XCardGameSpeedMode));
 ;
+var hjow_xcard_addGameMode = null;
+var hjow_xcard_addPlayerType = null;
 var XCardGameEngine = (function (_super) {
     __extends(XCardGameEngine, _super);
     function XCardGameEngine(plcArea, securityFunction, debugMode) {
@@ -1998,6 +2000,17 @@ var XCardGameEngine = (function (_super) {
         this.gameModeList.push(new XCardGameDefaultMode());
         this.gameModeList.push(new XCardGameSpeedMode());
         this.gameModeList.push(new XCardGameMultiplylessMode());
+        var selfObj = this;
+        if (hjow_xcard_addGameMode != null) {
+            hjow_xcard_addGameMode = function (gameMode) {
+                selfObj.gameModeList.push(gameMode);
+                selfObj.refreshPage();
+            };
+            hjow_xcard_addPlayerType = function (playerType) {
+                selfObj.playerTypes.push(playerType);
+                selfObj.refreshPage();
+            };
+        }
         var useBrowserSelectOpt = this.getProperty('use_browser_select');
         var useBrowserInputOpt = this.getProperty('use_browser_input');
         var screenApplySpeed = this.getProperty('screen_apply_speed');
@@ -2868,6 +2881,8 @@ var XCardGameEngine = (function (_super) {
                     hjow_select_init(this);
                 });
                 var insideHeight = jq(selfObj.placeArea).find('.td_select_container').height();
+                if (insideHeight >= heightVal - 350)
+                    insideHeight = heightVal - 350;
                 jq(selfObj.placeArea).find('.selalter').css('max-height', insideHeight - 5);
                 jq(selfObj.placeArea).find('.selalter').css('height', insideHeight - 5);
             }
