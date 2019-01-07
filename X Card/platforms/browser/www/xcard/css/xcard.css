@@ -192,6 +192,10 @@ limitations under the License.
     max-height: 15px;
 }
 
+.hjow_xcard_style_place .toolbar a {
+    font-size: 12px;
+}
+
 .hjow_xcard_style_place .toolbar span {
     margin: 0;
     font-size: 10px;

@@ -48,7 +48,7 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
 
     <script type="text/javascript">
         h.workOnDocumentReady(function (securityFunc) {
-            securityFunc(new XCardGameEngine('#xcard_place', hjow_appendToolbar).init()); // parameter should be a string !!
+            securityFunc(new XCardReplayEngine('#xcard_place', hjow_appendToolbar, true).init()); // parameter should be a string !!
             hjow_appendToolbar();
         });
         function hjow_appendToolbar(heavyRefresh) {
@@ -65,7 +65,7 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
 
     </div>
     <div class="hidden appendees_on_toolbars">
-        <a href="xcard_replay_player.html" class="toolbar_links">[Replay Player]</a>
+        <a href="xcard.html" class="toolbar_links">[Game]</a>
         <a href="#" onclick="hjow_showLicensePopup(); return false;" target="_blank" class="toolbar_links">[License]</a>
     </div>
 </body>

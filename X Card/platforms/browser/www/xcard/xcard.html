@@ -48,13 +48,25 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
 
     <script type="text/javascript">
         h.workOnDocumentReady(function (securityFunc) {
-            new XCardGameEngine('#xcard_place').init(); // parameter should be a string !!
+            securityFunc(new XCardGameEngine('#xcard_place', hjow_appendToolbar).init()); // parameter should be a string !!
+            hjow_appendToolbar();
         });
+        function hjow_appendToolbar(heavyRefresh) {
+            $('#xcard_place .toolbar_links').remove();
+            $('.toolbar_buttons').append(hjow_toStaticHTML($('.appendees_on_toolbars').html()));
+        };
+        function hjow_showLicensePopup() {
+            hjow_browserPopup('license.html?inbrowser=true');
+        }
     </script>
 </head>
 <body>
     <div id="xcard_place" class="auto_size" style="width:100%; height:100%;">
 
+    </div>
+    <div class="hidden appendees_on_toolbars">
+        <a href="xcard_replay_player.html" class="toolbar_links">[Replay Player]</a>
+        <a href="#" onclick="hjow_showLicensePopup(); return false;" target="_blank" class="toolbar_links">[License]</a>
     </div>
 </body>
 </html>

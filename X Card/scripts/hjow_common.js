@@ -67,8 +67,11 @@ function hjow_log(obj) {
 
 h.log = hjow_log;
 
-function hjow_error(e) {
-    hjow_rawLog(obj, false, false);
+function hjow_error(e, alertErr) {
+    hjow_rawLog(e, false, false);
+    if (alertErr) {
+        alert(e);
+    }
 };
 
 h.showError = hjow_error;
@@ -480,7 +483,12 @@ function hjow_toStaticHTML(htmlStr) {
 
 h.toStaticHTML = hjow_toStaticHTML;
 
-function hjow_workOnDocumentReady(actionFunc) {
+function hjow_workOnDocumentReady(actionFunc, delayNotDeviceReady) {
+    if (delayNotDeviceReady == null || typeof (delayNotDeviceReady) == 'undefined')
+        delayNotDeviceReady = 1000;
+    if (typeof (delayNotDeviceReady) == 'string')
+        delayNotDeviceReady = parseInt(delayNotDeviceReady);
+
     var flags = false;
     var newFunc = function () {
         if (flags) return;
@@ -491,7 +499,7 @@ function hjow_workOnDocumentReady(actionFunc) {
         }
         h.property.screenWidth = window.screenWidth;
         h.property.screenHeight = window.screenHeight;
-        var actionFuncParam = null;
+        var actionFuncParam = function (engine) { };
         try {
             jq = $;
             if (hjow_processSecurityProcess != null && typeof (hjow_processSecurityProcess) != 'undefined') {
@@ -507,7 +515,7 @@ function hjow_workOnDocumentReady(actionFunc) {
         var tempTimer = setTimeout(function () {
             newFunc();
             clearTimeout(tempTimer);
-        }, 1000);
+        }, delayNotDeviceReady);
     });
     document.addEventListener('deviceready', newFunc, false);
 };
@@ -615,8 +623,7 @@ function hjow_select_init(selectObj) {
             selObj.removeClass('sel_' + randomNo);
         }
         var parent = selObj.parent();
-        randomNo = String(Math.round(Math.random() * 999999999));
-        randomNo = randomNo + String(Math.round(Math.random() * 999999999));
+        randomNo = hjow_makeUniqueId('s', 2);
         selObj.addClass('hidden');
         selObj.addClass('sel_' + randomNo);
         selObj.attr('data-selalt', randomNo);
@@ -676,8 +683,7 @@ function hjow_input_init(inpObj) {
         if (!(inputObj.is('input') || inputObj.is('textarea'))) return;
         var randomNo = inputObj.attr('data-targetcomp-id');
         if (randomNo == null || typeof (randomNo) == 'undefined' || randomNo == '') {
-            randomNo = String(Math.round(Math.random() * 999999999));
-            randomNo = randomNo + String(Math.round(Math.random() * 999999999));
+            randomNo = hjow_makeUniqueId('i', 2);
             inputObj.attr('data-targetcomp-id', randomNo);
             inputObj.addClass('hjow_virtual_keyboard_target');
             inputObj.on('click', function () {
@@ -1024,6 +1030,22 @@ h.inputfunc = {
     close: h.input_close
 };
 
+function hjow_browserPopup(url) {
+    var browserPopupDialogObj = $('div.hjow_browser_popup_dialog');
+    if (browserPopupDialogObj.length <= 0) {
+        $('body').append("<div class='hjow_browser_popup_dialog hidden' title='Web'><iframe class='full'/></div>");
+        browserPopupDialogObj = $('div.hjow_browser_popup_dialog');
+    }
+    browserPopupDialogObj.dialog({
+        width: 600,
+        height: 500
+    });
+    var iframeObj = browserPopupDialogObj.find('iframe');
+    iframeObj.attr('src', url);
+};
+
+h.browserPopup = hjow_browserPopup;
+
 function hjow_runAfter(actFunc, timemills) {
     var tempTimer = setTimeout(function () {
         actFunc();
@@ -1033,8 +1055,72 @@ function hjow_runAfter(actFunc, timemills) {
 
 h.runAfter = hjow_runAfter;
 
+function hjow_getURLParameters() {
+    var urlBehind = window.location.search; // URL 에서 도메인 제외한 부분
+    urlBehind = urlBehind.substring(1); // 맨 앞 ? 기호 제거
+
+    var paramBlocks = urlBehind.split('&'); // & 로 나눔
+    var paramObj = {};
+    for (var idx = 0; idx < paramBlocks.length; idx++) {
+        var paramBlockOne = paramBlocks[idx].split('=');
+        var keyOf = paramBlockOne[0];
+        var valueOf = paramBlockOne[1];
+        paramObj[keyOf] = valueOf;
+    }
+    return paramObj;
+};
+
+h.getURLParameters = hjow_getURLParameters;
+
+function hjow_getURLParameter(keyOf) {
+    var params = hjow_getURLParameters();
+    var values = null;
+    $.each(params, function (k, v) {
+        if (values != null) return;
+        if (k == keyOf) values = v;
+    });
+    return values;
+};
+
+h.getURLParameter = hjow_getURLParameter;
+
+h.uniqueIds = {};
+h.uniqueIds.used = [];
+
+function hjow_makeUniqueId(prefix, randomCount) {
+    if (prefix == null || typeof (prefix) == 'undefined') prefix = '';
+    if (randomCount == null || typeof (randomCount) == 'undefined') randomCount = 2;
+    if (typeof (randomCount) == 'string') randomCount = parseInt(randomCount);
+    var results = '';
+
+    var notFinished = true;
+    while (notFinished) {
+        results = '';
+        for (var idx = 0; idx < randomCount; idx++) {
+            results = results + '' + Math.round(Math.random() * 999999999);
+        }
+        var notExists = true;
+        for (var udx = 0; udx < h.uniqueIds.used.length; udx++) {
+            if (results == h.uniqueIds.used[udx]) {
+                notExists = false;
+                break;
+            }   
+        }
+        if (notExists) {
+            notFinished = false;
+            break;
+        }   
+    }
+    h.uniqueIds.used.push(results);
+    return prefix + results;
+};
+
+h.makeUniqueId = hjow_makeUniqueId;
+h.uniqueIds.make = hjow_makeUniqueId;
+
 function hjow_ajax(obj) {
     $.ajax(obj);
 };
 
 h.ajax = hjow_ajax;
+
