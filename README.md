@@ -2,14 +2,15 @@
 
 ## 테스트 버전 플레이
 
-http://netstorm.woobi.co.kr/xcard/ 에 방문해 주세요.
+웹 브라우저로 다음 주소로 접속해 플레이하실 수 있습니다.
+  http://netstorm.woobi.co.kr/xcard/
 지원하는 웹 브라우저
   Google Chrome (60 이상)
   Mozilla Firefox (52 이상)
   Microsoft Edge (Windows 10 빌드 1803 내장 버전 이상)
   
 또는 안드로이드 알파 버전을 플레이해 보세요.
-https://github.com/HJOW/X-Card/edit/master/release/xcard_20190106_0230.apk
+  https://github.com/HJOW/X-Card/edit/master/release/xcard_20190106_0230.apk
   
 
 ## 이 프로젝트는? (What is this project?)
@@ -20,7 +21,12 @@ https://github.com/HJOW/X-Card/edit/master/release/xcard_20190106_0230.apk
    X Card is card game run on HTML and typescript.
    This project will run on Windows Universal App, but codes will capable on browser.
    
-   
+
+## 게임 규칙 요약 (Game Rule Simplified)
+
+   카드에는 숫자와 기호(＋－×) 하나씩이 그려져 있다.
+   카드를 사용해 내 점수를 올리거나 상대의 점수를 내린다.
+
 ## 게임 규칙 (Game Rule)
    
    플레이어는 최소 2명 이상이어야 하고, 최대 제한은 없지만 4명이서 플레이하는 것을 권장합니다.
