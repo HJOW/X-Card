@@ -550,14 +550,13 @@ function hjow_supportES5() {
 }
 ;
 h.supportES5 = hjow_supportES5;
-function hjow_getDeviceInfo() {
+var hjow_getDeviceInfo = function () {
     if (typeof (device) == 'undefined')
         return {
             platform: 'browser'
         };
     return device;
-}
-;
+};
 h.getDeviceInfo = hjow_getDeviceInfo;
 function hjow_getPlatform() {
     var deviceObj = hjow_getDeviceInfo();

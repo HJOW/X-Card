@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<widget android-versionCode="0" defaultlocale="ko-KR" id="hjow.game.xcard" version="0.0.3" windows-packageVersion="0.0.3.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:vs="http://schemas.microsoft.com/appx/2014/htmlapps">
+<widget android-versionCode="0" defaultlocale="ko-KR" id="hjow.game.xcard" version="0.0.4" windows-packageVersion="0.0.4.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:vs="http://schemas.microsoft.com/appx/2014/htmlapps">
   <name>X Card</name>
   <description>X Card 는 턴제 카드 게임입니다. 카드에는 숫자와 기호가 하나씩 부여되어 있습니다. -1 에서 10 사이의 숫자와 +, -, × 3가지 기호로 이루어진 33 종류의 카드를 사용한 게임입니다.</description>
   <author email="hujinone22@naver.com" href="http://cordova.io">HJOW</author>
   <vs:template-name>BlankJS</vs:template-name>
   <content src="index.html" />
-  <access origin="*" />
+  <access origin="http://hjow.dlinkddns.com/*" />
   <preference name="SplashScreen" value="screen" />
   <preference name="windows-target-version" value="10.0" />
   <plugin name="cordova-plugin-whitelist" spec="1.2.2" />
@@ -92,7 +92,7 @@
   <plugin name="cordova-plugin-network-information" spec="~2.0.1" />
   <preference name="WindowsStoreDisplayName" value="X Card" />
   <vs:platformSpecificValues>
-    <vs:platformSpecificWidget id="hjow.game.xcard" platformName="windows" version="0.0.3.0" />
+    <vs:platformSpecificWidget id="hjow.game.xcard" platformName="windows" version="0.0.4.0" />
   </vs:platformSpecificValues>
   <preference name="android-minSdkVersion" value="19" />
   <preference name="android-targetSdkVersion" value="28" />
@@ -108,4 +108,5 @@
   <engine name="browser" spec="^5.0.4" />
   <engine name="android" spec="^7.1.4" />
   <plugin name="es6-promise-plugin" spec="~4.2.2" />
+  <preference name="Orientation" value="landscape" />
 </widget>

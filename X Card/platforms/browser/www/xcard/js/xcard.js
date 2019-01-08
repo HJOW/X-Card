@@ -45,6 +45,14 @@ var jqo = {
 var jq = function (obj) {
     return jqo;
 };
+function hjow_makeArrayCompatible(stringArr) {
+    var newArr = [];
+    for (var idx = 0; idx < stringArr.length; idx++) {
+        newArr.push(stringArr[idx]);
+    }
+    return newArr;
+}
+;
 var hjow_onRefreshComponents = null;
 var UtilityMethods = (function () {
     function UtilityMethods() {
@@ -329,7 +337,7 @@ function hjow_getCurrentLanguageSet() {
     }
     if (typeof (browserLocale) == 'undefined' || browserLocale == null)
         return null;
-    var currentLocale = browserLocale;
+    var currentLocale = hjow_makeArrayCompatible(browserLocale);
     if (currentLocale == null || currentLocale.length <= 0)
         return null;
     for (var idx = 0; idx < currentLocale.length; idx++) {
@@ -1968,7 +1976,7 @@ var XCardGameEngine = (function (_super) {
         if (additionalRefreshFunction === void 0) { additionalRefreshFunction = null; }
         if (debugMode === void 0) { debugMode = false; }
         var _this = _super.call(this, "X Card", "X Card Game Core Engine") || this;
-        _this.version = "0.0.3";
+        _this.version = "0.0.4";
         _this.placeArea = null;
         _this.gameModeList = [];
         _this.gameModeIndex = 0;
@@ -2060,7 +2068,7 @@ var XCardGameEngine = (function (_super) {
         var useBrowserInputOpt = this.getProperty('use_browser_input');
         var screenApplySpeed = this.getProperty('screen_apply_speed');
         if (useBrowserSelectOpt == null || typeof (useBrowserSelectOpt) == 'undefined' || useBrowserSelectOpt == '') {
-            if (hjow_getPlatform() == 'android') {
+            if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'windowsuniversal') {
                 useBrowserSelectOpt = "false";
             }
             else {
@@ -2572,7 +2580,7 @@ var XCardGameEngine = (function (_super) {
     XCardGameEngine.prototype.refreshPage = function (heavyRefresh) {
         if (heavyRefresh === void 0) { heavyRefresh = true; }
         this.applyInputs();
-        if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser') {
+        if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser' || hjow_getPlatform() == 'windowsuniversal') {
             jq(this.placeArea).find('.selalter_option').off('click');
         }
         var inHeight = window.innerHeight - 20;
@@ -2887,7 +2895,7 @@ var XCardGameEngine = (function (_super) {
             affectorObjs = affectorSel.find("option");
             if (affectorObjs.length >= 1) {
                 affectorSel.val(jq(affectorObjs[affectorObjs.length - 1]).attr('value'));
-                if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser') {
+                if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'browser' || hjow_getPlatform() == 'windowsuniversal') {
                     hjow_select_sync(affectorSel);
                 }
             }
@@ -2909,13 +2917,14 @@ var XCardGameEngine = (function (_super) {
         var widthVal = jq(this.placeArea).width() - 10;
         if (widthVal < 700)
             widthVal = 700;
-        jq(this.placeArea).find('.player_arena_div').css('min-height', heightVal - 200 + 'px');
-        jq(this.placeArea).find('.player_arena_div').css('max-height', heightVal - 100 + 'px');
+        var minimumPad = 20;
+        jq(this.placeArea).find('.player_arena_div').css('min-height', heightVal - 100 - minimumPad + 'px');
+        jq(this.placeArea).find('.player_arena_div').css('max-height', heightVal - minimumPad + 'px');
         jq(this.placeArea).find('.player_arena_div').css('max-width', widthVal - 5 + 'px');
-        jq(this.placeArea).find('.div_player_arena_each').css('min-height', heightVal - 210 + 'px');
-        jq(this.placeArea).find('.div_player_arena_each').css('max-height', heightVal - 110 + 'px');
-        jq(this.placeArea).find('.table_player_arena_each').css('min-height', heightVal - 220 + 'px');
-        jq(this.placeArea).find('.table_player_arena_each').css('max-height', heightVal - 120 + 'px');
+        jq(this.placeArea).find('.div_player_arena_each').css('min-height', heightVal - 110 - minimumPad + 'px');
+        jq(this.placeArea).find('.div_player_arena_each').css('max-height', heightVal - minimumPad + 'px');
+        jq(this.placeArea).find('.table_player_arena_each').css('min-height', heightVal - 120 - minimumPad + 'px');
+        jq(this.placeArea).find('.table_player_arena_each').css('max-height', heightVal - minimumPad + 'px');
         jq(this.placeArea).find('.table_player_arena_each').each(function () {
             var heightLefts = jq(jq(this).find('.player_arena_one_line_layout')[0]).height() * 4;
             var thisHeight = jq(this).height();
@@ -3026,7 +3035,7 @@ var XCardGameEngine = (function (_super) {
         if (hjow_selectedLocale == null || typeof (hjow_selectedLocale) == 'undefined') {
             var browserLocale = hjow_getLocaleInfo();
             if (!(typeof (browserLocale) == 'undefined' || browserLocale == null)) {
-                var currentLocale = browserLocale;
+                var currentLocale = hjow_makeArrayCompatible(browserLocale);
                 if (currentLocale == null || currentLocale.length <= 0)
                     return null;
                 var needBreak = false;
@@ -3046,7 +3055,10 @@ var XCardGameEngine = (function (_super) {
         settingPage.find('.sel_language').val(customLocaleOpt);
         this.initTheme(1, false);
         var heightIn = settingPage.height();
-        settingPage.find('.setting_list').css('max-height', (heightIn - 150) + 'px');
+        var heightPad = 50;
+        if (this.isDebugMode())
+            heightPad += 100;
+        settingPage.find('.setting_list').css('max-height', (heightIn - heightPad) + 'px');
         var themeScript = this.getProperty('theme_1');
         settingPage.find('.tx_theme_script_1').val('');
         if (themeScript != null && themeScript != '') {
