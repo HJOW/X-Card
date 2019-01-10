@@ -320,6 +320,10 @@ var LanguageSet = (function (_super) {
         }
         return results;
     };
+    ;
+    LanguageSet.prototype.getImgPath = function () {
+        return './img/' + this.locale + '/';
+    };
     return LanguageSet;
 }(UtilityMethods));
 ;
@@ -3799,6 +3803,9 @@ var XCardGameEngine = (function (_super) {
     XCardGameEngine.prototype.prepareHowToPlayDialog = function () {
         var dialogObj = jq('.hjow_xcard_how_to_play_dialog');
         var htmls = "";
+        htmls += "<p>";
+        htmls += "<img src='" + hjow_getCurrentLanguageSet().getImgPath() + "layout.png" + "' style='width: 100%;'/>" + "\n";
+        htmls += "</p>";
         htmls += "<p>";
         htmls += hjow_replaceBr(hjow_trans("There must be at least two players, and there is no maximum limit, but it is recommended that four players play. Support play with simple AI computer.")) + "\n";
         htmls += "</p>";

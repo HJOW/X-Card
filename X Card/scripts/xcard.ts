@@ -262,8 +262,8 @@ class XCardAIProcessAction extends XCardReplayAction {
 }
 
 class LanguageSet extends UtilityMethods {
-    public locale: string = null;
-    public localeAlt: string = null;
+    public locale: string = null; // ko, en, ...
+    public localeAlt: string = null; // ko-KR, en-US, ...
     public localeName: string = null;
     public stringTable: Properties = null;
     public translate(target: string): string {
@@ -273,6 +273,9 @@ class LanguageSet extends UtilityMethods {
             return target;
         }   
         return results;
+    };
+    public getImgPath(): string {
+        return './img/' + this.locale + '/';
     }
 };
 var hjow_languageSets: LanguageSet[] = [];
@@ -3520,7 +3523,10 @@ class XCardGameEngine extends ModuleObject {
         var dialogObj = jq('.hjow_xcard_how_to_play_dialog');
 
         var htmls = "";
-        
+
+        htmls += "<p>";
+        htmls += "<img src='" + hjow_getCurrentLanguageSet().getImgPath() + "layout.png" + "' style='width: 100%;'/>" + "\n";
+        htmls += "</p>";
         htmls += "<p>";
         htmls += hjow_replaceBr(hjow_trans("There must be at least two players, and there is no maximum limit, but it is recommended that four players play. Support play with simple AI computer.")) + "\n";
         htmls += "</p>";
