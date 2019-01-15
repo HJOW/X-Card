@@ -1695,7 +1695,7 @@ var hjow_xcard_addGameMode = null;
 var hjow_xcard_addPlayerType = null;
 
 class XCardGameEngine extends ModuleObject {
-    protected version: string = "0.0.4";
+    protected version: string = "0.0.5";
     protected placeArea: string = null;
     protected gameModeList: XCardGameMode[] = [];
     protected gameModeIndex: number = 0;
