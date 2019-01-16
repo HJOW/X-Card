@@ -314,7 +314,7 @@ var LanguageSet = (function (_super) {
     LanguageSet.prototype.translate = function (target) {
         var results = this.stringTable.get(target);
         if (results == null) {
-            if (this.localeAlt != 'en-US')
+            if (this.localeAlt != 'en-US' && this.locale != 'en')
                 hjow_log(target);
             return target;
         }
@@ -1980,7 +1980,7 @@ var XCardGameEngine = (function (_super) {
         if (additionalRefreshFunction === void 0) { additionalRefreshFunction = null; }
         if (debugMode === void 0) { debugMode = false; }
         var _this = _super.call(this, "X Card", "X Card Game Core Engine") || this;
-        _this.version = "0.0.4";
+        _this.version = "0.0.6";
         _this.placeArea = null;
         _this.gameModeList = [];
         _this.gameModeIndex = 0;
@@ -2934,10 +2934,16 @@ var XCardGameEngine = (function (_super) {
             var thisHeight = jq(this).height();
             if (thisHeight < 220)
                 thisHeight = heightVal - 220;
+            if (thisHeight > heightVal - 150)
+                thisHeight = heightVal - 150;
             var heightSelCon = jq(this).find('.td_select_container').height() - 10;
             var heightIn = heightSelCon;
-            if (heightIn < 200)
-                heightIn = thisHeight - heightLefts - 10;
+            var stdHeightVal = thisHeight - heightLefts - 10;
+            if (heightIn < stdHeightVal - 100 || heightIn < 200) {
+                heightIn = stdHeightVal;
+                jq(this).find('.td_select_container').height(heightIn + 10);
+                heightSelCon = jq(this).find('.td_select_container').height() - 10;
+            }
             if (heightIn < 200)
                 heightIn = 200;
             if (heightIn >= heightSelCon)
@@ -3291,7 +3297,10 @@ var XCardGameEngine = (function (_super) {
         results += "      </td>" + "\n";
         results += "   </tr>" + "\n";
         results += "</table>" + "\n";
-        results += "<div class='replay_result element e087'><textarea class='replay_json element e088' readonly='readonly'></textarea></div>" + "\n";
+        results += "<div class='replay_result element e087'>" + "\n";
+        results += "  <div class='lb_replay_result element e162'>" + hjow_serializeXMLString(hjow_trans("Copy and save following codes and paste on the replay player to see progress again.")) + "</div>" + "\n";
+        results += "  <textarea class='replay_json element e088' readonly='readonly'></textarea>" + "\n";
+        results += "</div>" + "\n";
         return results;
     };
     ;
@@ -3985,6 +3994,7 @@ var XCardGameEngine = (function (_super) {
         newLangSet.stringTable.set("Player 'A' 's 'placed' cards : [＋5][－5][－6][－6][＋4][×4] Point calculation : (0 ＋ 5 － 5 － 6 － 6 ＋4) × 4 = －32", "플레이어 A의 자리에 [＋5][－5][－6][－6][＋4][×4] 가 순서대로 놓여 있으면\n점수 계산식은 (0 ＋ 5 － 5 － 6 － 6 ＋4) × 4 = －32");
         newLangSet.stringTable.set("The player with the highest score wins.", "점수가 가장 높은 플레이어가 승리합니다.");
         newLangSet.stringTable.set("Please visit [[URL]] to get more.", "[[URL]] 에 방문해 주세요.\n게임의 주요 소스코드가 공개되어 있습니다.");
+        newLangSet.stringTable.set("Copy and save following codes and paste on the replay player to see progress again.", "아래의 코드를 복사해 저장해 두세요. 리플레이 플레이어에 붙여넣어 리플레이 재생이 가능합니다.");
         hjow_languageSets.push(newLangSet);
     };
     ;
