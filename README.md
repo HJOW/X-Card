@@ -11,6 +11,7 @@
   
 또는 안드로이드 플레이 스토어에 올라가 있는 베타 버전을 이용할 수 있습니다.
   https://play.google.com/store/apps/details?id=hjow.game.xcard
+  
 또는 윈도우 스토어에서 앱을 다운로드 받을 수 있습니다. (한국 스토어에는 아직 출시 안됨)
   https://www.microsoft.com/store/apps/9NKQSF03F8MS
   
