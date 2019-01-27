@@ -1980,7 +1980,7 @@ var XCardGameEngine = (function (_super) {
         if (additionalRefreshFunction === void 0) { additionalRefreshFunction = null; }
         if (debugMode === void 0) { debugMode = false; }
         var _this = _super.call(this, "X Card", "X Card Game Core Engine") || this;
-        _this.version = "0.0.6";
+        _this.version = "0.0.7";
         _this.placeArea = null;
         _this.gameModeList = [];
         _this.gameModeIndex = 0;
@@ -3092,19 +3092,21 @@ var XCardGameEngine = (function (_super) {
         var results = "";
         results += "<table class='element e001 full layout'>" + "\n";
         results += "  <tr class='element e002'>" + "\n";
-        results += "     <td class='element e003 td_game_title'>" + "\n";
+        results += "     <td class='element e003 td_game_title' colspan='2'>" + "\n";
         results += "        <h2 class='element e004'>" + hjow_serializeXMLString(hjow_trans("X Card")) + "</h2>" + "\n";
         results += "     </td>" + "\n";
         results += "  </tr>" + "\n";
         results += "  <tr class='element e005'>" + "\n";
-        results += "     <td class='element e006 td_player_list'>" + "\n";
+        results += "     <td class='element e006 td_player_list' colspan='2'>" + "\n";
         results += "     </td>" + "\n";
         results += "  </tr>" + "\n";
         results += "  <tr class='element e006'>" + "\n";
-        results += "     <td class='element e007 td_game_start' style='height: 25px;'>" + "\n";
+        results += "     <td class='element e007 td_game_below td_game_start'>" + "\n";
         results += "        <select class='element e008 sel_game_mode'></select>" + "\n";
         results += "        <button type='button' class='element e009 btn_game_start'>" + hjow_serializeXMLString(hjow_trans("Start Game")) + "</button>" + "\n";
         results += "        <div class='element e010 div_game_mode_desc'></div>" + "\n";
+        results += "     </td>" + "\n";
+        results += "     <td class='element e163 td_game_below td_game_ads' style='width: 250px;'>" + "\n";
         results += "     </td>" + "\n";
         results += "  </tr>" + "\n";
         results += "</table>" + "\n";

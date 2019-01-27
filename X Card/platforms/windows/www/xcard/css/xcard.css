@@ -38,6 +38,18 @@ limitations under the License.
     font-size: 25px;
 }
 
+.hjow_xcard_style_place .td_game_below {
+    height: 25px;
+}
+
+.hjow_xcard_style_place .td_game_ads {
+    width: 250px;
+}
+
+.hjow_xcard_style_place .adv_area {
+    width: 250px;
+}
+
 .hjow_xcard_style_place td.td_player {
     border: 2px solid gray;
 }
