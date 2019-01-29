@@ -1099,6 +1099,7 @@ function hjow_makeUniqueId(prefix, randomCount) {
         for (var idx = 0; idx < randomCount; idx++) {
             results = results + '' + Math.round(Math.random() * 999999999);
         }
+        results = prefix + results;
         var notExists = true;
         for (var udx = 0; udx < h.uniqueIds.used.length; udx++) {
             if (results == h.uniqueIds.used[udx]) {
@@ -1112,15 +1113,170 @@ function hjow_makeUniqueId(prefix, randomCount) {
         }   
     }
     h.uniqueIds.used.push(results);
-    return prefix + results;
+    return results;
 };
 
 h.makeUniqueId = hjow_makeUniqueId;
 h.uniqueIds.make = hjow_makeUniqueId;
+
+h.temp = {};
+h.temp.otp = null;
+h.otp = {};
+
+function hjow_otp_createBlock(params) {
+    var otpObj = null;
+    
+    if (params != null && typeof (params) != 'string') {
+        if (typeof (params) != 'undefined' && typeof (params.objectType) != 'undefined') {
+            if (params.objectType == 'otp') {
+                otpObj = params;
+            }
+        }
+    }
+
+    if (otpObj == null) {
+        otpObj = {};
+        if (params == null || typeof (params) == 'undefined') otpObj.name = 'temp';
+        else otpObj.name = String(params);
+        otpObj.uniqueId = hjow_makeUniqueId('otp', 2);
+        otpObj.objectType = 'otp';
+
+        var cards = [];
+        for (var days = 0; days < 4; days++) {
+            for (var hours = 0; hours < 4; hours++) {
+                for (var minutes = 0; minutes < 60; minutes++) {
+                    var cardObj = {};
+                    cardObj.objectType = 'otp_card';
+                    cardObj.uniqueId = hjow_makeUniqueId('otpc', 3);
+                    cardObj.day = days;
+                    cardObj.hour = hours;
+                    cardObj.minute = minutes;
+                    cardObj.values = [];
+                    for (var val = 0; val < 4; val++) {
+                        var randomNo = Math.floor(Math.random() * 9990.0);
+                        cardObj.values.push(randomNo);
+                    }
+                    hjow_otp_prepare(cardObj);
+                    cards.push(cardObj);
+                }
+            }
+        }
+
+        otpObj.cards = cards;
+    }
+
+    hjow_otp_prepare(otpObj);
+
+    return otpObj;
+};
+
+h.otp.createBlock = hjow_otp_createBlock;
+var hjow_otp_create = hjow_otp_createBlock;
+
+function hjow_otp_createSet(params, counts) {
+    var otpSet = null;
+
+    if (params != null && typeof (params) != 'string') {
+        if (typeof (params) != 'undefined' && typeof (params.objectType) != 'undefined') {
+            if (params.objectType == 'otp_set') {
+                otpSet = params;
+            }
+        }
+    }
+
+    if (otpSet == null) {
+        otpSet = {};
+        if (params == null || typeof (params) == 'undefined') otpSet.name = 'temp';
+        else otpSet.name = String(params);
+        otpSet.uniqueId = hjow_makeUniqueId('otps', 2);
+        otpSet.objectType = 'otp_set';
+
+        var otpObjs = [];
+        var countNo = 16;
+        if (counts != null && typeof (counts) != 'undefined') {
+            countNo = parseInt(String(counts));
+        }
+        for (var idx = 0; idx < countNo; idx++) {
+            var otpObj = hjow_otp_createBlock(otpSet.name + '_' + idx);
+            otpObjs.push(otpObj);
+        }
+        otpSet.otps = otpObjs;
+    }
+
+    hjow_otp_prepare(otpSet);
+
+    return otpSet;
+};
+
+h.otp.create = hjow_otp_createSet;
+h.otp.createSet = hjow_otp_createSet;
+
+function hjow_otp_prepare(otpObj) {
+    if (typeof (otpObj) != 'string') {
+        if (typeof (otpObj.objectType) != 'undefined') {
+            if (otpObj.objectType == 'otp') {
+                otpObj.toPlainObject = function () {
+                    var newObj = {};
+                    newObj.objectType = 'otp';
+                    newObj.name = this.name;
+                    newObj.uniqueId = this.uniqueId;
+                    newObj.cards = this.cards;
+                    newObj.prepared = false;
+                    return newObj;
+                };
+                otpObj.getCard = function (date) {
+                    if (date == null) date = new Date();
+                    if (typeof (date) == 'string') date = hjow_string_to_date(date);
+                    for (var idx = 0; idx < this.cards.length; idx++) {
+                        var cardOne = this.cards[idx];
+                        if ((date.getDate() % 4) == cardOne.day && (date.getHours() % 4) == cardOne.hour && date.getMinutes() == cardOne.minute) {
+                            return cardOne;
+                        }
+                    };
+                    return null;
+                };
+                for (var cdx = 0; cdx < otpObj.cards.length; cdx++) {
+                    var cardOne = otpObj.cards[cdx];
+                    hjow_otp_prepare(cardOne);
+                }
+                otpObj.prepared = true;
+            } else if (otpObj.objectType == 'otp_card') {
+                otpObj.toPlainObject = function () {
+                    var newObj = {};
+                    newObj.objectType = 'otp_card';
+                    newObj.day = this.day;
+                    newObj.hour = this.hour;
+                    newObj.minute = this.minute;
+                    newObj.values = this.values;
+                    newObj.prepared = false;
+                    return newObj;
+                };
+                otpObj.getRandomIndex = function () {
+                    return Math.floor(Math.random() * (this.values.length * 1.0));
+                };
+                otpObj.prepared = true;
+            } else if (otpObj.objectType == 'otp_set') {
+                otpObj.toPlainObject = function () {
+                    var newObj = {};
+                    newObj.objectType = 'otp_set';
+                    newObj.name = this.name;
+                    newObj.uniqueId = this.uniqueId;
+                    newObj.otps = this.otps;
+                    newObj.prepared = false;
+                    return newObj;
+                };
+                otpObj.prepared = true;
+            }
+        }
+    }
+};
+
+h.otp.prepare = hjow_otp_prepare;
+
+
 
 function hjow_ajax(obj) {
     $.ajax(obj);
 };
 
 h.ajax = hjow_ajax;
-
