@@ -31,7 +31,8 @@
       "cordova-plugin-device": {},
       "cordova-plugin-network-information": {},
       "cordova-plugin-screen-orientation": {},
-      "cordova-plugin-inappbrowser": {}
+      "cordova-plugin-inappbrowser": {},
+      "es6-promise-plugin": {}
     }
   }
 }

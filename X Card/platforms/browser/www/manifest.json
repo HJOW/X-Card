@@ -7,5 +7,6 @@
   "description": "X Card 는 턴제 카드 게임입니다. 카드에는 숫자와 기호가 하나씩 부여되어 있습니다. -1 에서 10 사이의 숫자와 +, -, × 3가지 기호로 이루어진 33 종류의 카드를 사용한 게임입니다.",
   "author": "HJOW",
   "icons": [],
+  "orientation": "landscape",
   "start_url": "index.html"
 }

@@ -3535,10 +3535,7 @@ class XCardGameEngine extends ModuleObject {
         var dialogObj = jq('.hjow_xcard_how_to_play_dialog');
 
         var htmls = "";
-
-        htmls += "<p>";
-        htmls += "<img src='" + hjow_getCurrentLanguageSet().getImgPath() + "layout.png" + "' style='width: 100%;'/>" + "\n";
-        htmls += "</p>";
+        
         htmls += "<p>";
         htmls += hjow_replaceBr(hjow_trans("There must be at least two players, and there is no maximum limit, but it is recommended that four players play. Support play with simple AI computer.")) + "\n";
         htmls += "</p>";
@@ -3579,6 +3576,9 @@ class XCardGameEngine extends ModuleObject {
         htmls += hjow_replaceBr(hjow_trans("The player with the highest score wins.")) + "\n";
         htmls += "</p>";
         htmls += "<p>";
+        htmls += "<img src='" + hjow_getCurrentLanguageSet().getImgPath() + "layout.png" + "' style='width: 100%;'/>" + "\n";
+        htmls += "</p>";
+        htmls += "<p>";
         htmls += hjow_replaceBr(hjow_replaceStr(hjow_trans("Please visit [[URL]] to get more."), "[[URL]]", "<a href='https://github.com/HJOW/X-Card/blob/master/README.md' target='blank'>https://github.com/HJOW/X-Card/blob/master/README.md</a>")) + "\n";
         htmls += "</p>";
         
@@ -3589,7 +3589,7 @@ class XCardGameEngine extends ModuleObject {
         if (dialogObj.length <= 0) return;
         dialogObj.dialog({
             width: 780,
-            height: 550
+            height: 570
         });
     };
     protected prepareLanguageSets() {

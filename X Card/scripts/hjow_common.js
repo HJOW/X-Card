@@ -1002,7 +1002,12 @@ function hjow_input_onClick(inpObj) {
     virtualKeyboardDialogObj.find('.hjow_virtual_keyboard_show').val(inputObj.val() + '|');
     virtualKeyboardDialogObj.dialog({
         width: 560,
-        height: 320
+        height: 320,
+        close: function () {
+            try {
+                window.focus();
+            } catch (e) { }
+        }
     });
 };
 
@@ -1014,6 +1019,7 @@ function hjow_input_close() {
     try {
         if (virtualKeyboardDialogObj.dialog('isOpen')) {
             virtualKeyboardDialogObj.dialog('close');
+            window.focus();
         }
     } catch (e) { }
 };

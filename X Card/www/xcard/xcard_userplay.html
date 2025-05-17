@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <!--
-Copyright 2018 HJOW (hujinone22@naver.com)
+Copyright 2019 HJOW (hujinone22@naver.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,13 +42,14 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
     <script type="text/javascript" src="js/BigInteger.min.js"></script>
     <script type="text/javascript" src="js/hjow_common.js"></script>
     <script type="text/javascript" src="js/xcard.js"></script>
+    <script type="text/javascript" src="js/xcard_userplay.js"></script>
 
     <!-- js/not_opened.js is optional -->
     <script type="text/javascript" src="js/not_opened.js"></script>
 
     <script type="text/javascript">
         h.workOnDocumentReady(function (securityFunc) {
-            securityFunc(new XCardGameEngine('#xcard_place', hjow_appendToolbar).init()); // parameter should be a string !!
+            securityFunc(new XCardUserPlayEngine('#xcard_place', hjow_appendToolbar).init()); // parameter should be a string !!
             hjow_appendToolbar();
         });
         function hjow_appendToolbar(heavyRefresh) {
@@ -65,8 +66,7 @@ BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
 
     </div>
     <div class="hidden appendees_on_toolbars">
-        <a href="xcard_userplay.html" class="toolbar_links">[UserPlay Mode]</a>
-        <a href="xcard_replay_player.html" class="toolbar_links">[Replay Player]</a>
+        <a href="xcard.html" class="toolbar_links">[CustomGame]</a>
         <a href="#" onclick="hjow_showLicensePopup(); return false;" target="_blank" class="toolbar_links">[License]</a>
     </div>
 </body>
