@@ -5,7 +5,7 @@
 (기반이 되는 Cordova 버전이 너무 오래되서 살릴 수가 없습니다.)
 
 대신 안드로이드 웹뷰 기반으로 새 프로젝트를 만들었습니다.
-https://github.com/HJOW/X-Card-2nd-
+https://github.com/HJOW/X-Card-A
 
 ## 테스트 버전 플레이
 
