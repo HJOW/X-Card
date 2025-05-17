@@ -6,7 +6,7 @@
       <Version>15.0</Version>
     </AppxManifestMetaData>
     <AppxManifestMetaData Include="VisualStudioEdition">
-      <Value>Microsoft Visual Studio Community 2017</Value>
+      <Value>Microsoft Visual Studio Professional 2017</Value>
     </AppxManifestMetaData>
     <AppxManifestMetaData Include="C:\WINDOWS\system32\cmd.exe">
       <Name>OperatingSystem</Name>
