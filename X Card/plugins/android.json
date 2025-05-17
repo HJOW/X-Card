@@ -7,9 +7,6 @@
     "files": {}
   },
   "installed_plugins": {
-    "cordova-plugin-console": {
-      "PACKAGE_NAME": "hjow.game.xcard"
-    },
     "cordova-plugin-device": {
       "PACKAGE_NAME": "hjow.game.xcard"
     },

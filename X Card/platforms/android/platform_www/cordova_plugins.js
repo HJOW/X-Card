@@ -52,7 +52,6 @@ module.exports = [
 module.exports.metadata = 
 // TOP OF METADATA
 {
-    "cordova-plugin-console": "1.1.0",
     "cordova-plugin-device": "2.0.2",
     "cordova-plugin-inappbrowser": "3.0.0",
     "cordova-plugin-network-information": "2.0.1",

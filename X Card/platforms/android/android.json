@@ -44,9 +44,6 @@
     }
   },
   "installed_plugins": {
-    "cordova-plugin-console": {
-      "PACKAGE_NAME": "hjow.game.xcard"
-    },
     "cordova-plugin-device": {
       "PACKAGE_NAME": "hjow.game.xcard"
     },
@@ -118,7 +115,6 @@
     }
   ],
   "plugin_metadata": {
-    "cordova-plugin-console": "1.1.0",
     "cordova-plugin-device": "2.0.2",
     "cordova-plugin-inappbrowser": "3.0.0",
     "cordova-plugin-network-information": "2.0.1",
