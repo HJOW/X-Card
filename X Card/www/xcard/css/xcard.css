@@ -25,6 +25,14 @@ limitations under the License.
 .hjow_xcard_style_place {
     min-width: 790px;
     min-height: 590px;
+    overflow-y: hidden;
+}
+.hjow_xcard_style_place a {
+    color: blue;
+    text-decoration: none;
+}
+.hjow_xcard_style_place .page_main {
+    overflow-y: auto;
 }
 .hjow_xcard_style_place div.debugMode, td.debugMode {
     border: 1px solid gray !important;
@@ -65,9 +73,26 @@ limitations under the License.
     font-size: 20px;
 }
 
+.hjow_xcard_style_place .td_player_list {
+    vertical-align: top;
+}
+
 .hjow_xcard_style_place td.td_player_list table.player_list tr:not(.tr_player_empty), td.td_player_list table.player_list td:not(.td_player_empty), td.td_player_list table.player_list table.player_each, td.td_player_list table.player_list table.player_each td {
     width: 100%;
-    max-height: 100px;
+    max-height: 80px;
+}
+
+.hjow_xcard_style_place .player_list_div table.player_list {
+    /*height: 80px;*/
+    border-collapse: collapse;
+}
+
+.hjow_xcard_style_place .player_list_div table.player_list tr.tr_player {
+    height: 80px;
+}
+
+.hjow_xcard_style_place .player_list_div table.player_list tr .td_player_control {
+    vertical-align: top;
 }
 
 .hjow_xcard_style_place table.player_each {
@@ -117,7 +142,7 @@ limitations under the License.
     width: 100%;
     height: 100%;
     min-width: 120px;
-    min-height: 150px;
+    min-height: 100px;
 }
 
 .hjow_xcard_style_place .player_arena_one_line_layout {

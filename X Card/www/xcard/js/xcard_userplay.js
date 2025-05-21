@@ -1,14 +1,45 @@
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var XCardUserPlayEngine = (function (_super) {
+/*
+This JS library is made by HJOW.
+E-mail : hujinone22@naver.com
+
+This library need following libraries : jQuery, jQuery UI, BigInteger.js, hjow_common, xcard core.
+This library is coded as TypeScript. If this file's extension is 'js', please find 'ts' original file.
+
+jQuery : https://jquery.com/
+jQuery UI : https://jqueryui.com/
+BigInteger.js : https://www.npmjs.com/package/big-integer?activeTab=readme
+*/
+/*
+Copyright 2019 HJOW (hujinone22@naver.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+var XCardUserPlayEngine = /** @class */ (function (_super) {
     __extends(XCardUserPlayEngine, _super);
     function XCardUserPlayEngine(plcArea, additionalRefreshFunction, debugMode) {
         if (plcArea === void 0) { plcArea = '.hjow_xcard_style_place'; }
@@ -80,7 +111,7 @@ var XCardUserPlayEngine = (function (_super) {
         var useBrowserInputOpt = this.getProperty('use_browser_input');
         var screenApplySpeed = this.getProperty('screen_apply_speed');
         if (useBrowserSelectOpt == null || typeof (useBrowserSelectOpt) == 'undefined' || useBrowserSelectOpt == '') {
-            if (hjow_getPlatform() == 'android' || hjow_getPlatform() == 'windowsuniversal') {
+            if (h.getPlatform() == 'android' || h.getPlatform() == 'windowsuniversal') {
                 useBrowserSelectOpt = "false";
             }
             else {
@@ -89,7 +120,7 @@ var XCardUserPlayEngine = (function (_super) {
             this.setProperty('use_browser_select', useBrowserSelectOpt);
         }
         if (useBrowserInputOpt == null || typeof (useBrowserInputOpt) == 'undefined' || useBrowserInputOpt == '') {
-            if (hjow_getPlatform() == 'android') {
+            if (h.getPlatform() == 'android') {
                 useBrowserInputOpt = "false";
             }
             else {
@@ -135,14 +166,14 @@ var XCardUserPlayEngine = (function (_super) {
         if (this.players.length <= 0) {
             results += "   <tr class='tr_player pbasic_none  element'>" + "\n";
             results += "       <td class='td_player_none element'>" + "\n";
-            results += "          <span class='label element'>" + hjow_serializeXMLString(hjow_trans("Please add player to play.")) + "</span>" + "\n";
+            results += "          <span class='label element'>" + h.serializeXMLString(hjow_trans("Please add player to play.")) + "</span>" + "\n";
             results += "       </td>" + "\n";
             results += "   </tr>" + "\n";
         }
         else {
             for (var idx = 0; idx < this.players.length; idx++) {
                 var currentPlayer = this.players[idx];
-                results += "   <tr class='tr_player element pbasic_" + hjow_serializeString(currentPlayer.getUniqueId()) + "'>" + "\n";
+                results += "   <tr class='tr_player element pbasic_" + h.serializeString(currentPlayer.getUniqueId()) + "'>" + "\n";
                 results += "       <td class='td_player element'>" + "\n";
                 results += this.eachPlayerMainHTML(currentPlayer);
                 results += "       </td>" + "\n";
@@ -171,7 +202,7 @@ var XCardUserPlayEngine = (function (_super) {
         var selGameMode = jq(this.placeArea).find('.sel_game_mode');
         selGameMode.find('option').remove();
         for (var mdx = 0; mdx < this.gameModeList.length; mdx++) {
-            selGameMode.append(hjow_toStaticHTML("<option value='" + mdx + "'>" + hjow_serializeXMLString(hjow_trans(this.gameModeList[mdx].getName())) + "</option>"));
+            selGameMode.append(hjow_toStaticHTML("<option value='" + mdx + "'>" + h.serializeXMLString(hjow_trans(this.gameModeList[mdx].getName())) + "</option>"));
         }
         selGameMode.val(this.gameModeIndex);
         this.refreshMainGameMode(true);
@@ -185,7 +216,7 @@ var XCardUserPlayEngine = (function (_super) {
         results += "<table class='element e001 full layout'>" + "\n";
         results += "  <tr class='element e002'>" + "\n";
         results += "     <td class='element e003 td_game_title'>" + "\n";
-        results += "        <h2 class='element e004'>" + hjow_serializeXMLString(hjow_trans("X Card")) + "</h2>" + "\n";
+        results += "        <h2 class='element e004'>" + h.serializeXMLString(hjow_trans("X Card")) + "</h2>" + "\n";
         results += "     </td>" + "\n";
         results += "     <td class='element e003'>" + "\n";
         results += "        <select class='element sel_userplay_userlist'></select>" + "\n";
@@ -200,7 +231,7 @@ var XCardUserPlayEngine = (function (_super) {
         results += "  <tr class='element e006'>" + "\n";
         results += "     <td class='element e007 td_game_below td_game_start'>" + "\n";
         results += "        <select class='element e008 sel_game_mode'></select>" + "\n";
-        results += "        <button type='button' class='element e009 btn_game_start'>" + hjow_serializeXMLString(hjow_trans("Start Game")) + "</button>" + "\n";
+        results += "        <button type='button' class='element e009 btn_game_start'>" + h.serializeXMLString(hjow_trans("Start Game")) + "</button>" + "\n";
         results += "        <div class='element e010 div_game_mode_desc'></div>" + "\n";
         results += "     </td>" + "\n";
         results += "     <td class='element e163 td_game_below td_game_ads' style='width: 250px;'>" + "\n";
@@ -221,13 +252,13 @@ var XCardUserPlayEngine = (function (_super) {
         results += "   <tbody>" + "\n";
         results += "       <tr class='element e092'>" + "\n";
         results += "          <td class='element e093 player_info_basic_label'>" + "\n";
-        results += "              <span class='label element e094'>" + hjow_serializeXMLString(hjow_trans("Name")) + "</span>" + "\n";
+        results += "              <span class='label element e094'>" + h.serializeXMLString(hjow_trans("Name")) + "</span>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td class='element e095 player_info_basic'>" + "\n";
         var playerNameFieldOpt = "";
         if (!player.isNameEditable())
             playerNameFieldOpt = " disabled";
-        results += "             <input type='text' class='element e096 inp_pname need_custom_keyboard" + playerNameFieldOpt + "' name='pname_" + hjow_serializeString(player.getUniqueId()) + "' value='" + hjow_serializeString(player.getName()) + "'" + playerNameFieldOpt + "/>" + "\n";
+        results += "             <input type='text' class='element e096 inp_pname need_custom_keyboard" + playerNameFieldOpt + "' name='pname_" + h.serializeString(player.getUniqueId()) + "' value='" + h.serializeString(player.getName()) + "'" + playerNameFieldOpt + "/>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td rowspan='2' class='element e097'>" + "\n";
         var customHtml = player.customMainHTML();
@@ -237,10 +268,10 @@ var XCardUserPlayEngine = (function (_super) {
         results += "       </tr>" + "\n";
         results += "       <tr class='element e098'>" + "\n";
         results += "          <td class='player_info_basic_label element e099'>" + "\n";
-        results += "              <span class='label element e100'>" + hjow_serializeXMLString(hjow_trans("Type")) + "</span>" + "\n";
+        results += "              <span class='label element e100'>" + h.serializeXMLString(hjow_trans("Type")) + "</span>" + "\n";
         results += "          </td>" + "\n";
         results += "          <td class='player_info_basic element e101'>" + "\n";
-        results += "             <span class='player_type element e102'>" + hjow_serializeXMLString(hjow_trans(player.getPlayerTypeName())) + "</span>" + "\n";
+        results += "             <span class='player_type element e102'>" + h.serializeXMLString(hjow_trans(player.getPlayerTypeName())) + "</span>" + "\n";
         results += "          </td>" + "\n";
         results += "       </tr>" + "\n";
         results += "   </tbody>" + "\n";
@@ -266,12 +297,12 @@ var XCardUserPlayEngine = (function (_super) {
         }
         var selGameMode = jq(this.placeArea).find('.sel_game_mode');
         var selectedGameModeVal = selGameMode.val();
-        if (selectedGameModeVal != null) {
+        if (selectedGameModeVal != null) { // 화면이 가려져 있으면 값을 못가져옴
             this.gameModeIndex = parseInt(selectedGameModeVal);
         }
         for (var idx = 0; idx < this.players.length; idx++) {
             var playerOne = this.players[idx];
-            var playerBlock = jq(this.placeArea).find(".pbasic_" + hjow_serializeString(playerOne.getUniqueId()));
+            var playerBlock = jq(this.placeArea).find(".pbasic_" + h.serializeString(playerOne.getUniqueId()));
             if (playerBlock.length == 0)
                 continue;
             playerOne.setName(playerBlock.find('.inp_pname').val(), this);
@@ -347,17 +378,17 @@ var XCardUserPlayEngine = (function (_super) {
             selfAny.showHowToPlayDialog();
         });
         this.reAllocateButtonEvent(jq('.btn_console_run'), function (compObj) {
-            hjow_log(eval(jq(selfObj.placeArea).find('.tx_console_run').val()));
+            h.log(eval(jq(selfObj.placeArea).find('.tx_console_run').val()));
             hjow_openLogDialog();
         });
         this.reAllocateButtonEvent(jq('.btn_exit'), function (compObj) {
-            hjow_tryExit();
+            h.tryExit();
         });
     };
     ;
     XCardUserPlayEngine.prototype.prepareEvents = function () {
         var selfObj = this;
-        var selfAny = this.getSelfObject();
+        var selfAny = this.getSelfObject(); // 이렇게 안하면 타입스크립트 제한사항 때문에 메소드 부여가 안 됨
         selfAny.events = {};
         selfAny.events.main = {};
         selfAny.events.main.btn_game_start = function () {
@@ -369,7 +400,7 @@ var XCardUserPlayEngine = (function (_super) {
         };
         selfAny.events.main.btn_del_userplay_player = function () {
             if (selfObj.userplayUsers.length <= 1) {
-                hjow_alert(hjow_trans("Cannot delete a player."), hjow_trans('Information'));
+                h.alert(hjow_trans("Cannot delete a player."), hjow_trans('Information'));
                 return;
             }
             hjow_removeItemFromArray(selfObj.userplayUsers, selfObj.userplaySelectedIndex);
@@ -386,7 +417,7 @@ var XCardUserPlayEngine = (function (_super) {
                 }
             }
             if (playerCreator == null) {
-                hjow_alert(hjow_trans("Please select correct player type."), hjow_trans('Information'));
+                h.alert(hjow_trans("Please select correct player type."), hjow_trans('Information'));
                 return;
             }
             var newPlayer = playerCreator.create(playerCreator.getTypeName() + " " + selfObj.players.length);
@@ -420,7 +451,7 @@ var XCardUserPlayEngine = (function (_super) {
         };
         selfAny.events.main.btn_save_settings = function () {
             if (!hjow_parseBoolean(selfObj.getProperty('localStorageAvailable'))) {
-                hjow_alert(hjow_trans('On this platform, local storage saving is not working. Changes will be applied only this time.'));
+                h.alert(hjow_trans('On this platform, local storage saving is not working. Changes will be applied only this time.'));
             }
             selfObj.applySettings();
             if (selfObj.isDebugMode()) {
@@ -459,19 +490,19 @@ var XCardUserPlayEngine = (function (_super) {
                     selfObj.replay = null;
                 }
             }
-            hjow_log("TURN [" + player.getName() + "] : " + hjow_trans("Get one card from deck."));
+            h.log("TURN [" + player.getName() + "] : " + hjow_trans("Get one card from deck."));
             selfObj.nextTurn();
         };
         selfAny.events.game.btn_pay_here = function (playerUniqId) {
-            var player = selfObj.players[selfObj.turnPlayerIndex];
-            var playerInvenObj = jq(selfObj.getPlaceArea()).find(".pplace_" + hjow_serializeString(player.getUniqueId()) + " .inventory");
-            var selectedCardVal = playerInvenObj.val();
+            var player = selfObj.players[selfObj.turnPlayerIndex]; // 현재 턴의 플레이어
+            var playerInvenObj = jq(selfObj.getPlaceArea()).find(".pplace_" + h.serializeString(player.getUniqueId()) + " .inventory");
+            var selectedCardVal = playerInvenObj.val(); // 배열
             if (selectedCardVal.length <= 0) {
-                hjow_alert(hjow_trans("Please select your card first."), hjow_trans('Information'));
+                h.alert(hjow_trans("Please select your card first."), hjow_trans('Information'));
                 return;
             }
             if (selectedCardVal.length > 1) {
-                hjow_alert(hjow_trans("Cannot pay multiple cards."), hjow_trans('Information'));
+                h.alert(hjow_trans("Cannot pay multiple cards."), hjow_trans('Information'));
                 return;
             }
             selfObj.payHere(playerUniqId, selectedCardVal[0]);
@@ -506,7 +537,7 @@ var XCardUserPlayEngine = (function (_super) {
     return XCardUserPlayEngine;
 }(XCardGameEngine));
 ;
-var XCardUserplayUserPlayer = (function (_super) {
+var XCardUserplayUserPlayer = /** @class */ (function (_super) {
     __extends(XCardUserplayUserPlayer, _super);
     function XCardUserplayUserPlayer(name) {
         var _this = _super.call(this, name) || this;
@@ -531,7 +562,7 @@ var XCardUserplayUserPlayer = (function (_super) {
     ;
     XCardUserplayUserPlayer.prototype.customMainHTML = function () {
         var results = "";
-        results += "<span class='label element'>" + hjow_serializeXMLString(hjow_trans("Credit")) + "</span> : <span class='label element credit'>" + this.getCredit() + "</span>" + "\n";
+        results += "<span class='label element'>" + h.serializeXMLString(hjow_trans("Credit")) + "</span> : <span class='label element credit'>" + this.getCredit() + "</span>" + "\n";
         return results;
     };
     ;
@@ -557,7 +588,7 @@ var XCardUserplayUserPlayer = (function (_super) {
     return XCardUserplayUserPlayer;
 }(XCardUserPlayer));
 ;
-var XCardUserplayAIPlayer = (function (_super) {
+var XCardUserplayAIPlayer = /** @class */ (function (_super) {
     __extends(XCardUserplayAIPlayer, _super);
     function XCardUserplayAIPlayer(name) {
         var _this = _super.call(this, name) || this;
@@ -605,15 +636,40 @@ var XCardUserplayAIPlayer = (function (_super) {
             return;
         if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
             return;
+        // 플레이어에게 주어지는 시간 (남은 시간과 1초정도 다를 수 있음)
         var currentPlayerTime = mode.getEachPlayerTimeLimit(this, engine);
         var timeLimitStd = Math.ceil(currentPlayerTime / 5.0);
         if (timeLimitStd <= 2)
             timeLimitStd = 2;
+        /////// AI 인공지능 처리 시작 ///////
+        // 결과 변수 준비
         var needToGetFromDeck = true;
         var targetPlayerUniqId = null;
         var targetCardUniqId = null;
+        // 최적의 수 계산
         var needDefaultCalc = true;
-        if (this.customAIScript != null && this.customAIScript != '') {
+        /***********************************************
+        // customAIScript 안에 들어갈 문자열 내용 샘플
+        var aiProcessFunction = function(engine, deck, players, currentPlayerTime) { // deck 은 덱에 있는 카드 객체들의 배열, players 는 플레이어 객체들의 배열 (객체 안에서 필요한 데이터와 고유값에 액세스하면 됨), currentPlayerTime 는 플레이어의 제한 시간
+            var getDeck = true;              // 덱에서 카드를 받아야 할 때 true 지정 (다른 플레이어에게 카드를 놓아야 할 때는 반드시 false 로 지정할 것)
+            var targetPlayerUniqueId = null; // 카드를 다른 플레이어에게 놓아야 할 때, 대상 플레이어의 고유값 지정
+            var targetCardUniqueId   = null; // 카드를 다른 플레이어에게 놓아야 할 때, 대상 카드의 고유값 지정
+
+            // 이 곳에서 연산 작업 수행
+            
+            return {
+                needToGetFromDeck: getDeck         // needToGetFromDeck 이름은 반드시 지켜야 호환됨
+              , targetPlayer: targetPlayerUniqueId // targetPlayer 이름은 반드시 지켜야 호환됨
+              , targetCard: targetCardUniqueId     // targetCard 이름은 반드시 지켜야 호환됨
+            };
+        };
+        var returnObject = {
+            aiProcess: aiProcessFunction // aiProcess 이름은 반드시 지켜야 호환됨
+        };
+        // eval 처리 결과로 리턴 처리를 위해 만들어둔 변수명을 적어 마무리
+        returnObject
+        ***********************************************/
+        if (this.customAIScript != null && this.customAIScript != '') { // 커스텀 AI 스크립트 여부 확인해 처리
             var resultObj = eval(this.customAIScript);
             if (resultObj == null || typeof (resultObj) == 'undefined') {
                 needDefaultCalc = true;
@@ -630,61 +686,66 @@ var XCardUserplayAIPlayer = (function (_super) {
             }
         }
         if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-            return;
-        if (needDefaultCalc) {
+            return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+        if (needDefaultCalc) { // 기본 제공 인공지능 처리 로직
+            // 사용 가능한 동작들을 다 배열에 넣어서 각각 수행 결과 이득 정도를 점수를 매겨 그중 높은 점수를 선택하도록 함 (난이도가 낮으면 랜덤하게 일정 확률로 덜 높은 점수의 동작을 선택하면 됨)
             var availableActions = [];
             var oneAct = null;
-            var offensives = 1;
-            var defendees = 1;
+            var offensives = 1; // 공격 행동 비율점수
+            var defendees = 1; // 방어 행동 비율점수
+            // 난이도에 따라 인공지능을 좀 더 방어적으로 행동하도록 함
             if (this.difficulty == 2)
                 defendees = 2;
             if (this.difficulty == 1)
                 defendees = 4;
             if (this.difficulty == 0)
                 defendees = 8;
+            // 덱에서 카드를 받는 동작은 항상 사용가능 (단, 지금 다른 플레이어에 비해 불리한 상황이면서 덱에 남은 카드 수가 적으면, 점수를 낮게 책정함) --> 동작 수는 항상 1 이상
             oneAct = new XCardAIProcessAction();
             oneAct.card = null;
-            oneAct.payTargetPlayerIndex = -1;
+            oneAct.payTargetPlayerIndex = -1; // 덱에서 카드 받을 때는 -1
             oneAct.actionPlayerIndex = 0;
             oneAct.calculatedAIPoint = new TBigInt(0);
             var currentThisUserPoint = this.getCurrentPoint(mode);
-            if (deck.length < Math.ceil(players.length / 2.0)) {
+            if (deck.length < Math.ceil(players.length / 2.0)) { // 덱에 있는 카드 수가 매우 적으면 (플레이어 많으면 기준치를 적정량 늘려야 함)
                 for (var idx = 0; idx < players.length; idx++) {
                     if (players[idx].getUniqueId() == this.getUniqueId())
                         continue;
-                    if (players[idx].getCurrentPoint(mode).compare(currentThisUserPoint) > 0) {
-                        oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(players[idx].getCurrentPoint(mode).subtract(currentThisUserPoint));
+                    if (players[idx].getCurrentPoint(mode).compare(currentThisUserPoint) > 0) { // 다른 플레이어가 지금 이 플레이어보다 점수가 높음
+                        oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(players[idx].getCurrentPoint(mode).subtract(currentThisUserPoint)); // 다른 플레이어와 이 플레이어의 점수 차만큼 점수 제거
                     }
-                    if (players[idx].getCurrentPoint(mode).compare(currentThisUserPoint) == 0) {
-                        oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(new TBigInt(1));
+                    if (players[idx].getCurrentPoint(mode).compare(currentThisUserPoint) == 0) { // 다른 플레이어가 지금 이 플레이어와 점수가 동일
+                        oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(new TBigInt(1)); // 1점
                     }
                 }
             }
-            oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(new TBigInt(offensives));
+            oneAct.calculatedAIPoint = oneAct.calculatedAIPoint.subtract(new TBigInt(offensives)); // 공격 행동 비율점수만큼 뺄셈
             availableActions.push(oneAct);
             if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-                return;
-            var playerOrders = hjow_orderPlayerList(players, mode);
-            var sumPoint = new TBigInt(0);
-            var selfOrder = -1;
+                return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+            var playerOrders = hjow_orderPlayerList(players, mode); // 점수 순위로 플레이어 순서 정렬한 배열 미리 준비 (점수가 너무 낮은 플레이어에게 공격하는 것을 방지하기 위함)
+            var sumPoint = new TBigInt(0); // 전체 플레이어의 점수도 계산할 예정
+            var selfOrder = -1; // 자기자신의 순위 계산
             for (var podx = 0; podx < playerOrders.length; podx++) {
                 if (playerOrders[podx].getUniqueId() == this.getUniqueId()) {
                     selfOrder = podx;
                 }
                 sumPoint = sumPoint.add(playerOrders[podx].getCurrentPoint(mode));
             }
-            var avgPoint = sumPoint.divide(new TBigInt(players.length));
-            var bestPoint = playerOrders[0].getCurrentPoint(mode);
-            var worstPoint = playerOrders[playerOrders.length - 1].getCurrentPoint(mode);
-            var variancePoint = bestPoint.subtract(worstPoint);
+            var avgPoint = sumPoint.divide(new TBigInt(players.length)); // 평균 점수
+            var bestPoint = playerOrders[0].getCurrentPoint(mode); // 1등의 현 점수
+            var worstPoint = playerOrders[playerOrders.length - 1].getCurrentPoint(mode); // 꼴찌의 점수
+            var variancePoint = bestPoint.subtract(worstPoint); // 1등과 꼴찌 점수 차이
+            // 다른 플레이어에게 카드를 줄 수 있는 모든 경우의 수 찾기
             for (var cdx = 0; cdx < this.inventory.length; cdx++) {
                 var invCard = this.inventory[cdx];
                 for (var pdx = 0; pdx < players.length; pdx++) {
                     var playerOne = players[pdx];
                     var errMsg = playerOne.canPay(invCard, this);
                     if (errMsg != null)
-                        continue;
-                    var playerOneOrder = -1;
+                        continue; // 카드 내기가 불가능 - 사용 가능 동작에 등록하지 않음
+                    // 사용 가능 동작임이 확인됨, 동작 점수 계산
+                    var playerOneOrder = -1; // 이 대상 플레이어의 순위 계산
                     for (var podx2 = 0; podx2 < playerOrders.length; podx2++) {
                         if (playerOrders[podx2].getUniqueId() == playerOne.getUniqueId()) {
                             playerOneOrder = podx2;
@@ -692,21 +753,24 @@ var XCardUserplayAIPlayer = (function (_super) {
                         }
                     }
                     var actionPoint = null;
-                    var beforePoint = playerOne.getCurrentPoint(mode);
-                    var simulatedPoint = playerOne.getCurrentPointIfPaid(mode, invCard);
+                    var beforePoint = playerOne.getCurrentPoint(mode); // 이 대상 플레이어의 변화 전 점수
+                    var simulatedPoint = playerOne.getCurrentPointIfPaid(mode, invCard); // 이 대상 플레이어의 변화결과 점수
                     if (playerOne.getUniqueId() == this.getUniqueId()) {
-                        actionPoint = simulatedPoint.multiply(new TBigInt(defendees));
+                        actionPoint = simulatedPoint.multiply(new TBigInt(defendees)); // 자기자신에게 카드를 놓음 - 방어 비율 적용
                     }
                     else {
-                        actionPoint = simulatedPoint.multiply(new TBigInt(-1)).multiply(new TBigInt(offensives));
-                        if (beforePoint.compare(simulatedPoint) > 0) {
-                            var orderStd = Math.ceil(players.length / 2.0);
-                            if (selfOrder < playerOneOrder && Math.abs(playerOneOrder - selfOrder) >= orderStd) {
+                        actionPoint = simulatedPoint.multiply(new TBigInt(-1)).multiply(new TBigInt(offensives)); // 상대방에게 카드를 놓음 - 공격 비율 적용
+                        // 상대방 플레이어의 순위가 자신 대비 너무 낮은 경우 더 공격할 필요가 줄어듦 - 공격 확률 축소
+                        if (beforePoint.compare(simulatedPoint) > 0) { // 카드를 두면 상대의 점수가 더 적어지는 경우에만 이 기능 적용 (공격이 아닌, 어쩔 수 없이 손해를 보더라도 두는 경우는 이 기능 적용 안 하기 위함)
+                            var orderStd = Math.ceil(players.length / 2.0); // 순위 차이가 어느정도 나야 많이 나는 것으로 인식해야 할 지를 적당히 계산함
+                            if (selfOrder < playerOneOrder && Math.abs(playerOneOrder - selfOrder) >= orderStd) { // 순위는 숫자가 낮을수록 좋음!! 위에서 계산한 기준치 적용
+                                // bigInt 는 정수만 지원하므로 나눗셈을 하면 나머지 부분이 날아감 (소수점 내림), 그러므로, 먼저 2배를 하고 나눗셈을 한 후 2를 다시 나누면 반올림 효과 비슷하게 동작함
                                 actionPoint = actionPoint.multiply(new TBigInt(2));
-                                actionPoint = actionPoint.divide(new TBigInt(Math.round(Math.abs(playerOneOrder - selfOrder))).multiply(new TBigInt(10)));
+                                actionPoint = actionPoint.divide(new TBigInt(Math.round(Math.abs(playerOneOrder - selfOrder))).multiply(new TBigInt(10))); // 순위 차이 만큼 나눔, 순위 차이가 클 수록 나누는 수가 커짐
                                 actionPoint = actionPoint.divide(new TBigInt(2));
+                                // 점수 차가 너무 벌어져 있다면 이것으로도 부족하므로 추가 작업
                                 if (avgPoint.compare(beforePoint) > 0) {
-                                    var targetPlayerGapAvg = avgPoint.subtract(beforePoint);
+                                    var targetPlayerGapAvg = avgPoint.subtract(beforePoint); // 평균 점수에서 타겟 플레이어 점수를 뺌
                                     if (targetPlayerGapAvg.abs().compare(variancePoint.abs().divide(new TBigInt(4))) > 0) {
                                         actionPoint = actionPoint.subtract(new TBigInt(-999999999));
                                     }
@@ -714,10 +778,11 @@ var XCardUserplayAIPlayer = (function (_super) {
                             }
                         }
                     }
+                    // 이 시점에서 actionPoint 는 null 이 아님
                     for (var pdx2 = 0; pdx2 < players.length; pdx2++) {
                         var playerAnother = players[pdx2];
                         if (playerAnother.getUniqueId() == playerOne.getUniqueId())
-                            continue;
+                            continue; // 이미 계산한 플레이어는 점수 계산에서 제외
                         if (playerAnother.getUniqueId() == this.getUniqueId()) {
                             actionPoint = actionPoint.add(playerAnother.getCurrentPoint(mode));
                         }
@@ -729,24 +794,25 @@ var XCardUserplayAIPlayer = (function (_super) {
                     oneAct.card = invCard;
                     oneAct.payTargetPlayerIndex = pdx;
                     oneAct.actionPlayerIndex = 0;
-                    for (var pdx3 = 0; pdx3 < players.length; pdx3++) {
+                    for (var pdx3 = 0; pdx3 < players.length; pdx3++) { // 자기자신의 인덱스를 알아내기 위함
                         if (players[pdx3].getUniqueId() == this.getUniqueId()) {
                             oneAct.actionPlayerIndex = pdx3;
                             break;
                         }
                     }
                     oneAct.calculatedAIPoint = actionPoint;
-                    availableActions.push(oneAct);
+                    availableActions.push(oneAct); // 동작에 추가
                     if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-                        return;
+                        return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
                     if (engine.getLeftTime() < timeLimitStd)
-                        break;
+                        break; // 시간 제한이 지나지는 않았으나 얼마 안남았으면 반복처리 중단, 지금까지의 연산 결과만 반영
                 }
                 if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-                    return;
+                    return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
                 if (engine.getLeftTime() < timeLimitStd)
-                    break;
+                    break; // 시간 제한이 지나지는 않았으나 얼마 안남았으면 반복처리 중단, 지금까지의 연산 결과만 반영
             }
+            // 동작들을 가지고 순서 매기기
             var orderedActions = [];
             var maxPoints = new TBigInt("-99999999999999");
             var maxIdx = -1;
@@ -770,7 +836,7 @@ var XCardUserplayAIPlayer = (function (_super) {
                     hjow_removeItemFromArray(availableActions, maxIdx);
                 }
                 if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-                    return;
+                    return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
                 preventInfLoop++;
                 if (preventInfLoop >= 1000 * Math.max(availableActions.length, 1)) {
                     hjow_error("Infinite Loop Detected");
@@ -778,56 +844,58 @@ var XCardUserplayAIPlayer = (function (_super) {
                 }
             }
             if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-                return;
+                return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+            // 동작들 중 실제 수행할 동작 선택
             var selectedAct = null;
             var randomNo = Math.round(Math.random() * 100.0);
-            if (this.difficulty >= 4) {
-                selectedAct = orderedActions[0];
+            if (this.difficulty >= 4) { // 미친 난이도
+                selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
             }
-            else if (this.difficulty == 3) {
+            else if (this.difficulty == 3) { // 극한
                 if (randomNo >= 10)
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (orderedActions.length >= 2)
-                    selectedAct = orderedActions[1];
+                    selectedAct = orderedActions[1]; // 차선
                 else
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
             }
-            else if (this.difficulty == 2) {
+            else if (this.difficulty == 2) { // 어려움
                 if (randomNo >= 50)
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (randomNo >= 10 && orderedActions.length >= 2)
-                    selectedAct = orderedActions[1];
+                    selectedAct = orderedActions[1]; // 차선
                 else if (orderedActions.length >= 3)
-                    selectedAct = orderedActions[2];
+                    selectedAct = orderedActions[2]; // 차차선
                 else
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
             }
-            else if (this.difficulty == 1) {
+            else if (this.difficulty == 1) { // 보통
                 if (randomNo >= 65)
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (randomNo >= 30 && orderedActions.length >= 2)
-                    selectedAct = orderedActions[1];
+                    selectedAct = orderedActions[1]; // 차선
                 else if (randomNo >= 10 && orderedActions.length >= 3)
-                    selectedAct = orderedActions[2];
+                    selectedAct = orderedActions[2]; // 차차선
                 else if (randomNo >= 5 && orderedActions.length >= 4)
-                    selectedAct = orderedActions[3];
+                    selectedAct = orderedActions[3]; // 차차차선
                 else
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
             }
-            else {
+            else { // 쉬움
                 if (randomNo >= 70)
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
                 else if (randomNo >= 60 && orderedActions.length >= 2)
-                    selectedAct = orderedActions[1];
+                    selectedAct = orderedActions[1]; // 차선
                 else if (randomNo >= 50 && orderedActions.length >= 3)
-                    selectedAct = orderedActions[2];
+                    selectedAct = orderedActions[2]; // 차차선
                 else if (randomNo >= 20 && orderedActions.length >= 4)
-                    selectedAct = orderedActions[3];
+                    selectedAct = orderedActions[3]; // 차차차선
                 else if (randomNo >= 5 && orderedActions.length >= 5)
-                    selectedAct = orderedActions[4];
+                    selectedAct = orderedActions[4]; // 차차차차선
                 else
-                    selectedAct = orderedActions[0];
+                    selectedAct = orderedActions[0]; // 그냥 가장 좋은 선택을 함
             }
+            // 동작 처리
             if (selectedAct == null || selectedAct.payTargetPlayerIndex < 0) {
                 needToGetFromDeck = true;
             }
@@ -838,7 +906,8 @@ var XCardUserplayAIPlayer = (function (_super) {
             }
         }
         if (engine.isActPlayerStopRequested() || (!engine.isThisTurn(this)))
-            return;
+            return; // 시간 제한이 지났는지 확인 (지났으면 연산 중단)
+        // 계산 결과 집행
         if (needToGetFromDeck || targetPlayerUniqId == null || targetCardUniqId == null || targetPlayerUniqId == '' || targetCardUniqId == '') {
             engine.getSelfObject().events.game.btn_get_from_deck();
             return;
@@ -856,11 +925,11 @@ var XCardUserplayAIPlayer = (function (_super) {
         results += "<div class='div_player_ai_custom_element'>";
         results += "<span class='label'>" + hjow_trans("Difficulty") + "</span> ";
         results += "<select class='sel_ai_difficulty'>";
-        results += "<option value='2'>" + hjow_serializeXMLString(hjow_trans("Normal")) + "</option>";
+        results += "<option value='2'>" + h.serializeXMLString(hjow_trans("Normal")) + "</option>";
         results += "</select>";
         results += "</div>";
         results += "<div class='div_player_ai_custom_element wide'>";
-        results += "<textarea class='tx_ai_script advanceMode' placeholder=\"" + hjow_serializeString("// " + hjow_trans("paste custom AI script here if you want")) + "\"></textarea>";
+        results += "<textarea class='tx_ai_script advanceMode' placeholder=\"" + h.serializeString("// " + hjow_trans("paste custom AI script here if you want")) + "\"></textarea>";
         results += "</div>";
         return results;
     };
@@ -913,7 +982,7 @@ var XCardUserplayAIPlayer = (function (_super) {
     return XCardUserplayAIPlayer;
 }(XCardPlayer));
 ;
-var XCardUserplayUserPlayerCreator = (function (_super) {
+var XCardUserplayUserPlayerCreator = /** @class */ (function (_super) {
     __extends(XCardUserplayUserPlayerCreator, _super);
     function XCardUserplayUserPlayerCreator() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -963,7 +1032,7 @@ var XCardUserplayUserPlayerCreator = (function (_super) {
     return XCardUserplayUserPlayerCreator;
 }(XCardPlayerCreator));
 ;
-var XCardUserplayAIPlayerCreator = (function (_super) {
+var XCardUserplayAIPlayerCreator = /** @class */ (function (_super) {
     __extends(XCardUserplayAIPlayerCreator, _super);
     function XCardUserplayAIPlayerCreator() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -1015,4 +1084,3 @@ var XCardUserplayAIPlayerCreator = (function (_super) {
     return XCardUserplayAIPlayerCreator;
 }(XCardPlayerCreator));
 ;
-//# sourceMappingURL=xcard_userplay.js.map

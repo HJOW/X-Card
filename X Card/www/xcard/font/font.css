@@ -1,0 +1,21 @@
+@font-face {
+    font-family: "D2Coding";
+    src: url("D2Coding-Ver1.3.2-20180524.ttf") format("truetype");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "D2Coding";
+    src: url("D2CodingBold-Ver1.3.2-20180524.ttf") format("truetype");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "D2Coding";
+    src: url("D2CodingBold-Ver1.3.2-20180524.ttf") format("truetype");
+    font-weight: bolder;
+}
+
+html, body, div, span, p, a, pre, input, textarea, select, button, table, tr, td, th, h1, h2, h3, h4, h5, h6, section, nav, footer {
+    font-family: "D2Coding", "NanumGothic", "Nanum Gothic", "NanumGothicCoding", "Nanum Gothic Coding", sans-serif;
+}

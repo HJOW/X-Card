@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <link rel="stylesheet" type="text/css" href="font/font.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery.toast.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css"/>
+        <title>XCard</title>
+        <style type="text/css">
+            html, body, div {
+                background-color: black;
+                color: white;
+            }
+        </style>
+        <script type="text/javascript" src="../cordova.js"></script>
+        <script type="text/javascript" src="../scripts/platformOverrides.js"></script>
+        <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+        <script type="text/javascript" src="scripts/jquery.toast.min.js"></script>
+        <script type="text/javascript" src="js/hjow_common.js"></script>
+        <script type="text/javascript">
+            function fLog(t) { try { console.log(t); } catch(e) {} }
+            $(function(){
+                // location.href = "xcard.html";
+                var runComplete = false;
+
+                setTimeout(function() {
+                    if (! runComplete) {
+                        runComplete = true;
+                        fLog("Run XCard local");
+                        location.href = "xcard.html";
+                    }
+                }, 4000);
+
+                $.ajax({
+                    url : 'https://x-card-deeb7.web.app/app.json',
+                    method : 'GET',
+                    dataType : 'json',
+                    success : function(data) {
+                        if (! runComplete) {
+                            runComplete = true;
+                            try {
+                                var currentBuild = h.getBuildNumber();
+                                var remoteBuild  = data.build;
+                                if(data.config.update) {
+                                    if(currentBuild < remoteBuild) {
+                                        $.toast("앱 업데이트가 필요합니다.");
+                                    }
+                                }
+
+                                if(data.remoteBuild.use) {
+                                    fLog("Run XCard on cloud");
+                                    location.href = data.remoteBuild.url;
+                                } else {
+                                    fLog("Run XCard local");
+                                    location.href = "xcard.html";
+                                }
+                            } catch(e) {
+                                fLog("Run XCard local");
+                                location.href = "xcard.html";
+                            }
+                        }
+                    }, error : function() {
+                        if (! runComplete) {
+                            runComplete = true;
+                            fLog("Run XCard local");
+                            location.href = "xcard.html";
+                        }
+                    }
+                });
+
+                // XCardInterface 이름으로 XCardInterface 클래스 메소드에 액세스 가능 (@JavascriptInterface 어노테이션 있는 메소드만 가능)
+            });
+        </script>
+    </head>
+    <body>
+        <div class="app">
+            <div style="text-align: center; width: 100%;">잠시만 기다려 주십시오...</div>
+            <div style="text-align: center; width: 100%;"><progress style="width: 50%;"></progress></div>
+            <div style="text-align:right; position: fixed; bottom: 20px; right: 50px;"><a href="xcard.html">이동</a></div>
+        </div>
+    </body>
+</html>

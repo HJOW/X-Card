@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="font/font.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="css/hjow_common.css" />
+    <link rel="stylesheet" type="text/css" href="css/xcard.css" />
+    <link rel="stylesheet" type="text/css" href="css/xcard_theme_dark.css" />
+    <script type="text/javascript" src="../cordova.js"></script>
+    <script type="text/javascript" src="../scripts/platformOverrides.js"></script>
+    <script type="text/javascript" src="scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="scripts/jquery-ui.js"></script>
+    <script type="text/javascript" src="scripts/BigInteger.min.js"></script>
+    <script type="text/javascript" src="scripts/hjow_common.js"></script>
+    <script type="text/javascript" src="js/xcard.js"></script>
+    <script type="text/javascript">
+        h.workOnDocumentReady(function (securityFunc) {
+            var closeBtnOpt = hjow_getURLParameter('inbrowser');
+            if (closeBtnOpt != null && hjow_parseBoolean(closeBtnOpt)) {
+                $('div.footer').hide();
+            }
+        }, 300);
+        function fn_closePage() {
+            if(h.getPlatform() == 'android') {
+                location.href = 'xcard.html';
+                return;
+            }
+            window.close();
+        }
+    </script>
+    <title>Privacy Policy</title>
+</head>
+<body class="scroll_x scroll_y">
+    <div class="section">
+        <h2>개인정보 보호정책</h2>
+        <pre>
+이 앱은 현재 저(HJOW) 혼자 개발중이며, 멀티플레이 추가 및 설정값 저장로직 변경 등 개인정보에 관련되어 있는 변경 사항이 있는 경우 이 곳에 내용을 추가할 예정입니다.
+앱이 업데이트되면 이 곳을 확인하셔서 내용을 확인하시기 바랍니다.
+
+지금 이 개인정보 보호정책 문서는 2019년 1월 6일 작성되었습니다.
+
+이 X Calc 게임에서는, "플레이어 이름" 외의 어떤 개인정보도 입력받지 않으며, 플레이어 이름 또한 실명으로 입력할 필요가 없습니다.
+이외 X Calc 게임 코드 내에서는 어떤 정보도 저장하거나 전송하지 않습니다.
+       </pre>
+    </div>
+    <div class="footer">
+        <!--<a href="xcard.html">돌아가기</a>-->
+        <!--<button type="button" onclick="fn_closePage(); return false;">확인</button>-->
+        <button type="button" onclick="history.back(); return false;">OK</button>
+    </div>
+</body>
+</html>

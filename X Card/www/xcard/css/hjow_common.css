@@ -21,6 +21,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+.invisible {
+    display: none;
+}
+
 body {
     overflow-x: hidden;
     overflow-y: hidden;
