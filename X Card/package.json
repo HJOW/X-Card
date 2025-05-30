@@ -2,7 +2,7 @@
   "name": "X Card",
   "version": "1.0.0",
   "dependencies": {
-    "cordova-android": "^7.1.4",
+    "cordova-android": "^14.0.1",
     "cordova-browser": "^5.0.4",
     "cordova-ios": "~4.2.0",
     "cordova-plugin-device": "~2.0.2",
@@ -10,7 +10,7 @@
     "cordova-plugin-network-information": "~2.0.1",
     "cordova-plugin-screen-orientation": "^3.0.1",
     "cordova-plugin-whitelist": "1.2.2",
-    "cordova-windows": "~4.4.2",
+    "cordova-windows": "~7.0.1",
     "es6-promise-plugin": "^4.2.2",
     "jquery": "^3.1.1"
   },
